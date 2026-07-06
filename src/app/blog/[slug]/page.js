@@ -1,35 +1,55 @@
 'use client';
+import { use } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { FiArrowLeft } from 'react-icons/fi';
+import { blogPosts } from '@/data/blogPosts';
 
-const post = {
-  title: 'Best Deworming Medicine for Dogs in Pakistan',
-  category: 'Dog Care',
-  date: 'May 18, 2024',
-  author: 'Admin',
-  image: '🐕',
-  content: [
-    'Deworming your dog regularly is one of the most important parts of responsible pet ownership. Intestinal worms can cause serious health problems if left untreated, ranging from mild digestive upset to severe weight loss and anemia.',
-    'In Pakistan, the most common worms affecting dogs include roundworms, hookworms, tapeworms, and whipworms. Puppies should be dewormed starting at 2 weeks of age, then every 2 weeks until 12 weeks old, followed by monthly treatments until 6 months.',
-    'For adult dogs, deworming every 3 months is generally recommended, though this can vary based on lifestyle factors like outdoor exposure and contact with other animals.',
-    'Some of the most trusted deworming medicines available include Drontal Plus, Milbemax, and Panacur. Always consult with your veterinarian before starting any deworming program, especially for puppies, pregnant dogs, or dogs with existing health conditions.',
-  ],
-};
+export default function BlogDetailPage({ params }) {
+  const router = useRouter();
+  const { slug } = use(params);
 
-const relatedPosts = [
-  { title: 'Dog Vaccination Schedule', slug: 'dog-vaccination-schedule', image: '🐕' },
-  { title: 'Dog Skin Infection Treatment', slug: 'dog-skin-infection-treatment', image: '🐕' },
-];
+  const post = blogPosts.find((p) => p.slug === slug);
 
-export default function BlogDetailPage() {
+  // Related posts — same category ke baqi posts, current post ko chhor kar
+  const relatedPosts = post
+    ? blogPosts.filter((p) => p.category === post.category && p.slug !== post.slug).slice(0, 2)
+    : [];
+
+  if (!post) {
+    return (
+      <div style={{ backgroundColor: 'var(--bg)', minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '56px', marginBottom: '16px' }}>📄</div>
+          <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '8px' }}>Blog post not found</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>Yeh article maujood nahi hai ya hata diya gaya hai.</p>
+          <Link href="/blog" className="btn-primary" style={{ display: 'inline-block', padding: '10px 24px' }}>Back to Blog</Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
       {/* Breadcrumb */}
       <div style={{ backgroundColor: 'white', padding: '14px 20px', borderBottom: '1px solid var(--border)' }}>
-        <div className="container" style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
-          <Link href="/" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Home</Link>
-          {' → '}
-          <Link href="/blog" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Blog</Link>
-          {' → '} {post.title}
+        <div className="container">
+          <button onClick={() => {
+            if (typeof window !== 'undefined' && window.history.length > 1) {
+              router.back();
+            } else {
+              router.push('/blog');
+            }
+          }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '13px', fontWeight: '600', padding: '0', marginBottom: '10px' }}>
+            <FiArrowLeft size={15} /> Back
+          </button>
+          <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+            <Link href="/" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Home</Link>
+            {' → '}
+            <Link href="/blog" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Blog</Link>
+            {' → '} {post.title}
+          </div>
         </div>
       </div>
 
@@ -53,7 +73,7 @@ export default function BlogDetailPage() {
           ))}
 
           {/* Share */}
-          <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)' }}>Share this article:</span>
             <button style={{ padding: '6px 16px', borderRadius: '20px', border: 'none', backgroundColor: '#1877f2', color: 'white', cursor: 'pointer', fontSize: '13px' }}>Facebook</button>
             <button style={{ padding: '6px 16px', borderRadius: '20px', border: 'none', backgroundColor: '#25D366', color: 'white', cursor: 'pointer', fontSize: '13px' }}>WhatsApp</button>
@@ -61,20 +81,31 @@ export default function BlogDetailPage() {
         </div>
 
         {/* Related Posts */}
-        <div style={{ marginTop: '28px' }}>
-          <h2 style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '16px' }}>Related Articles</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            {relatedPosts.map((rp) => (
-              <Link key={rp.slug} href={`/blog/${rp.slug}`} style={{ textDecoration: 'none' }}>
-                <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
-                  <div style={{ fontSize: '36px' }}>{rp.image}</div>
-                  <span style={{ fontWeight: '600', fontSize: '14px', color: 'var(--text)' }}>{rp.title}</span>
-                </div>
-              </Link>
-            ))}
+        {relatedPosts.length > 0 && (
+          <div style={{ marginTop: '28px' }}>
+            <h2 style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '16px' }}>Related Articles</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}
+              data-related-grid>
+              {relatedPosts.map((rp) => (
+                <Link key={rp.slug} href={`/blog/${rp.slug}`} style={{ textDecoration: 'none' }}>
+                  <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+                    <div style={{ fontSize: '36px' }}>{rp.image}</div>
+                    <span style={{ fontWeight: '600', fontSize: '14px', color: 'var(--text)' }}>{rp.title}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
+
+      <style jsx>{`
+        @media (max-width: 600px) {
+          [data-related-grid] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -3,13 +3,35 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiUploadCloud, FiCheckCircle } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import useCartStore from '@/store/useCartStore';
 
-// Payment account details - yahan se change karo
+// =====================================================================
+// ADMIN KA WHATSAPP NUMBER — YAHAN APNA REAL NUMBER DAALO
+// Format: country code + number (koi spaces, dashes ya + nahi)
+// Example: Pakistan 03001234567 → 923001234567
+// =====================================================================
+const ADMIN_WHATSAPP = '923295780676'; // ← APNA NUMBER YAHAN LIKHEIN
+
+// =====================================================================
+// PAYMENT DETAILS — YAHAN APNI REAL VALUES BHARO
+// Sirf yeh ek jagah update karo, baaki sab automatically change ho jayega
+// =====================================================================
 const paymentAccounts = {
-  Easypaisa: { number: '0300-1234567', title: 'Furr & Feather\'s Hospital' },
-  JazzCash: { number: '0300-1234567', title: 'Furr & Feather\'s Hospital' },
-  BankTransfer: { bank: 'HBL Bank', accountNumber: '0123-4567890-01', iban: 'PK36HABB0001234567890123', title: 'Furr & Feather\'s Hospital' },
+  Easypaisa: {
+    number: '03427524477',        // ← APNA EASYPAISA NUMBER YAHAN LIKHO
+    title: 'Muhammad Rizwan',  // ← Account title (naam) — change karo agar different hai
+  },
+  JazzCash: {
+    number: '03295780676',        // ← APNA JAZZCASH NUMBER YAHAN LIKHO
+    title: 'Muhammad Rizwan',  // ← Account title (naam) — change karo agar different hai
+  },
+  BankTransfer: {
+    bank: 'JS Bank',          // ← APNA BANK NAAM YAHAN LIKHO (jaise "Meezan Bank", "HBL", "UBL")
+    accountNumber: '0002842674',  // ← APNA ACCOUNT NUMBER YAHAN LIKHO
+    iban: 'PK11JSBL9141000002842764', // ← APNA IBAN YAHAN LIKHO
+    title: 'Muhammad Rizwan',  // ← Account title (naam) — change karo agar different hai
+  },
 };
 
 const SHIPPING_COST = 300;
@@ -108,7 +130,9 @@ export default function CheckoutPage() {
 
       const orderItems = items.map((item) => ({
         product: item.productId,
-        name: item.name,
+        variantId: item.variantId || undefined,
+        variantLabel: item.variantLabel || undefined,
+        name: item.variantLabel ? `${item.name} (${item.variantLabel})` : item.name,
         image: item.image,
         price: item.price,
         quantity: item.quantity,
@@ -150,17 +174,39 @@ export default function CheckoutPage() {
   };
 
   if (orderPlaced) {
+    // Pre-filled WhatsApp message — order details already typed hoge jab admin ko message jaye
+    const waMessage = encodeURIComponent(
+      `Assalam o Alaikum! Mera order place ho gaya hai.\n\n` +
+      `Order ID: ${orderPlaced._id}\n` +
+      `Naam: ${orderPlaced.customerName}\n` +
+      `Phone: ${orderPlaced.phone}\n\n` +
+      `Shukriya!`
+    );
+    const waLink = `https://wa.me/${ADMIN_WHATSAPP}?text=${waMessage}`;
+
     return (
       <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div style={{ backgroundColor: 'white', borderRadius: '20px', padding: '40px 28px', textAlign: 'center', maxWidth: '480px', width: '100%', boxShadow: '0 4px 24px rgba(0,0,0,0.1)' }}>
           <div style={{ width: '70px', height: '70px', backgroundColor: '#f0fdf4', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: '32px' }}>✅</div>
-          <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '12px' }}>Thank You!</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '8px', fontSize: '14px' }}>Your order has been placed successfully.</p>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '12px' }}>Shukriya!</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '8px', fontSize: '14px' }}>Aapka order successfully place ho gaya hai.</p>
+
           <div style={{ backgroundColor: 'var(--bg)', borderRadius: '10px', padding: '14px', margin: '18px 0' }}>
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Order Number</p>
-             <p style={{ fontSize: '16px', fontWeight: '800', color: 'var(--primary)', wordBreak: 'break-all' }}>{orderPlaced._id}</p>
+            <p style={{ fontSize: '16px', fontWeight: '800', color: 'var(--primary)', wordBreak: 'break-all' }}>{orderPlaced._id}</p>
           </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginBottom: '24px' }}>We will contact you soon to confirm your order.</p>
+
+          {/* WhatsApp Confirmation Button */}
+          <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
+            <p style={{ fontSize: '13px', color: '#166534', fontWeight: '600', marginBottom: '4px' }}>📱 Order Confirm Karein</p>
+            <p style={{ fontSize: '12px', color: '#166534', marginBottom: '12px', opacity: 0.8 }}>Behtareen experience ke liye WhatsApp par apna order confirm karein — message already ready hoga, sirf send karna hoga</p>
+            <a href={waLink} target="_blank" rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: '#25D366', color: 'white', padding: '12px 24px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '15px' }}>
+              <FaWhatsapp size={20} /> WhatsApp par Confirm Karein
+            </a>
+          </div>
+
+          <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginBottom: '24px' }}>Hum jald hi aapse rabta karenge order confirm karne ke liye.</p>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/track-order" className="btn-primary">Track Order</Link>
             <Link href="/shop" className="btn-outline">Continue Shopping</Link>
@@ -304,14 +350,19 @@ export default function CheckoutPage() {
               <>
                 <p style={{ fontWeight: '700', fontSize: '14px', color: '#92400e', marginBottom: '8px' }}>🏦 Bank Transfer — Advance Payment Required</p>
                 <p style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.6', marginBottom: '10px' }}>
-                  To confirm your order, please transfer the delivery charges of Rs. {SHIPPING_COST} in advance. The product amount (Rs. {subtotal.toLocaleString()}) will be collected at the time of delivery.
+                  {isCOD
+                    ? `To confirm your order, please transfer the delivery charges of Rs. ${SHIPPING_COST} in advance. The product amount (Rs. ${subtotal.toLocaleString()}) will be collected at the time of delivery.`
+                    : `To confirm your order, please transfer the full amount of Rs. ${total.toLocaleString()} in advance (includes delivery charges).`
+                  }
                 </p>
                 <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '12px', fontSize: '13px', color: 'var(--text)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <p><strong>Bank:</strong> {paymentAccounts.BankTransfer.bank}</p>
                   <p><strong>Account Number:</strong> {paymentAccounts.BankTransfer.accountNumber}</p>
                   <p><strong>IBAN:</strong> {paymentAccounts.BankTransfer.iban}</p>
                   <p><strong>Account Title:</strong> {paymentAccounts.BankTransfer.title}</p>
-                  <p style={{ marginTop: '4px', fontWeight: '700', color: 'var(--primary)' }}>Amount to transfer: Rs. {SHIPPING_COST}</p>
+                  <p style={{ marginTop: '4px', fontWeight: '700', color: 'var(--primary)' }}>
+                    Amount to transfer: Rs. {isCOD ? SHIPPING_COST : total.toLocaleString()}
+                  </p>
                 </div>
               </>
             ) : (
@@ -320,12 +371,17 @@ export default function CheckoutPage() {
                   📱 {paymentMethod} — Advance Payment Required
                 </p>
                 <p style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.6', marginBottom: '10px' }}>
-                  To confirm your order, please send the delivery charges of Rs. {SHIPPING_COST} in advance. The product amount (Rs. {subtotal.toLocaleString()}) will be collected at the time of delivery.
+                  {isCOD
+                    ? `To confirm your order, please send the delivery charges of Rs. ${SHIPPING_COST} in advance. The product amount (Rs. ${subtotal.toLocaleString()}) will be collected at the time of delivery.`
+                    : `To confirm your order, please send the full amount of Rs. ${total.toLocaleString()} in advance (includes delivery charges).`
+                  }
                 </p>
                 <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '12px', fontSize: '13px', color: 'var(--text)' }}>
                   <p><strong>Number:</strong> {paymentAccounts[paymentMethod].number}</p>
                   <p><strong>Account Title:</strong> {paymentAccounts[paymentMethod].title}</p>
-                  <p style={{ marginTop: '6px', fontWeight: '700', color: 'var(--primary)' }}>Amount to send: Rs. {SHIPPING_COST}</p>
+                  <p style={{ marginTop: '6px', fontWeight: '700', color: 'var(--primary)' }}>
+                    Amount to send: Rs. {isCOD ? SHIPPING_COST : total.toLocaleString()}
+                  </p>
                 </div>
               </>
             )}
@@ -370,7 +426,10 @@ export default function CheckoutPage() {
           </div>
 
           <button onClick={handleSubmit} disabled={loading} className="btn-primary" style={{ width: '100%', padding: '15px', fontSize: '15px', fontWeight: '800', textAlign: 'center', opacity: loading ? 0.7 : 1 }}>
-            {loading ? 'Placing Order...' : `✅ Place Order — Pay Rs. ${SHIPPING_COST} Now`}
+            {loading ? 'Placing Order...' : isCODAvailable
+              ? `✅ Place Order — Pay Rs. ${SHIPPING_COST} Now`
+              : `✅ Place Order — Pay Rs. ${total.toLocaleString()} Now`
+            }
           </button>
         </div>
 
@@ -378,12 +437,15 @@ export default function CheckoutPage() {
           <h2 style={{ fontWeight: '700', fontSize: '17px', marginBottom: '18px', color: 'var(--primary)' }}>Your Order</h2>
 
           {items.map((item) => (
-            <div key={item.productId} style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
+            <div key={`${item.productId}-${item.variantId || 'base'}`} style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
               <div style={{ backgroundColor: 'var(--bg)', borderRadius: '8px', width: '44px', height: '44px', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {item.image ? <img src={item.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📦'}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text)', lineHeight: '1.4', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</p>
+                {item.variantLabel && (
+                  <p style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: '600', marginBottom: '2px' }}>{item.variantLabel}</p>
+                )}
                 <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Qty: {item.quantity}</p>
               </div>
               <p style={{ fontSize: '13px', fontWeight: '700', color: 'var(--primary)', whiteSpace: 'nowrap' }}>Rs. {(item.price * item.quantity).toLocaleString()}</p>
@@ -405,10 +467,20 @@ export default function CheckoutPage() {
             <span style={{ color: 'var(--primary)' }}>Rs. {total.toLocaleString()}</span>
           </div>
 
-          <div style={{ marginTop: '12px', padding: '10px', backgroundColor: '#f0f1ff', borderRadius: '8px', fontSize: '12px', color: 'var(--primary)' }}>
-            Pay now: <strong>Rs. {SHIPPING_COST}</strong> (delivery charges)<br />
-            Pay on delivery: <strong>Rs. {subtotal.toLocaleString()}</strong>
-          </div>
+          {form.city && (
+            <div style={{ marginTop: '12px', padding: '12px', backgroundColor: isCODAvailable ? '#f0fdf4' : '#eff6ff', borderRadius: '8px', fontSize: '13px', color: isCODAvailable ? '#166534' : '#1e40af', lineHeight: '1.8' }}>
+              {isCODAvailable ? (
+                <>
+                  💳 Pay now: <strong>Rs. {SHIPPING_COST}</strong> (delivery charges)<br />
+                  🚚 Pay on delivery: <strong>Rs. {subtotal.toLocaleString()}</strong>
+                </>
+              ) : (
+                <>
+                  💳 Pay Now: <strong>Rs. {total.toLocaleString()}</strong> (full payment in advance)
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

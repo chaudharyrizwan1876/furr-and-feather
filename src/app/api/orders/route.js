@@ -33,20 +33,41 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Zaroori fields missing hain' }, { status: 400 });
     }
 
-    // Stock check karo aur kam karo
+    // Stock check karo (variant-specific ya base product, jo bhi applicable ho)
     for (const item of orderItems) {
       const product = await Product.findById(item.product);
       if (!product) {
         return NextResponse.json({ message: `Product nahi mila: ${item.name}` }, { status: 404 });
       }
-      if (product.stock < item.quantity) {
-        return NextResponse.json({ message: `${item.name} ka stock kam hai. Sirf ${product.stock} available hai.` }, { status: 400 });
+
+      if (item.variantId) {
+        const variant = product.variants.find((v) => v._id.toString() === item.variantId.toString());
+        if (!variant) {
+          return NextResponse.json({ message: `Variant nahi mila: ${item.name}` }, { status: 404 });
+        }
+        if (variant.stock < item.quantity) {
+          return NextResponse.json({ message: `${item.name} ka stock kam hai. Sirf ${variant.stock} available hai.` }, { status: 400 });
+        }
+      } else {
+        if (product.stock < item.quantity) {
+          return NextResponse.json({ message: `${item.name} ka stock kam hai. Sirf ${product.stock} available hai.` }, { status: 400 });
+        }
       }
     }
 
-    // Sab theek hai to stock kam karo
+    // Sab theek hai to stock kam karo aur numSold barhao (variant-specific ya base product)
     for (const item of orderItems) {
-      await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } });
+      if (item.variantId) {
+        const product = await Product.findById(item.product);
+        const variant = product.variants.find((v) => v._id.toString() === item.variantId.toString());
+        variant.stock -= item.quantity;
+        // Base stock ko bhi sync rakhte hain — variants ke total stock ka sum
+        product.stock = product.variants.reduce((sum, v) => sum + v.stock, 0);
+        product.numSold = (product.numSold || 0) + item.quantity;
+        await product.save();
+      } else {
+        await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity, numSold: item.quantity } });
+      }
     }
 
     const order = await Order.create({

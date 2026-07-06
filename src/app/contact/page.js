@@ -60,7 +60,7 @@ export default function ContactPage() {
             <FaWhatsapp size={36} style={{ marginBottom: '10px' }} />
             <h3 style={{ fontWeight: '700', fontSize: '16px', marginBottom: '6px' }}>Chat With Us Instantly</h3>
             <p style={{ fontSize: '13px', opacity: 0.9, marginBottom: '16px' }}>Get quick answers on WhatsApp</p>
-            <a href="https://wa.me/923001234567" target="_blank" style={{ backgroundColor: 'white', color: '#25D366', padding: '10px 24px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '14px', display: 'inline-block' }}>
+            <a href="https://wa.me/923295780676" target="_blank" style={{ backgroundColor: 'white', color: '#25D366', padding: '10px 24px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '14px', display: 'inline-block' }}>
               Open WhatsApp
             </a>
           </div>

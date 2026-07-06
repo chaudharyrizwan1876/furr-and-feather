@@ -1,11 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   FiGrid, FiBox, FiTag, FiShoppingBag, FiUsers, FiFileText,
-  FiStar, FiPackage, FiPercent, FiCreditCard, FiSearch, FiSettings, FiLogOut, FiMenu, FiX
+  FiStar, FiPackage, FiCreditCard, FiSearch, FiSettings, FiLogOut, FiMenu, FiX
 } from 'react-icons/fi';
 
 const menuItems = [
@@ -17,7 +17,6 @@ const menuItems = [
   { label: 'Blog', icon: <FiFileText />, href: '/admin/blogs' },
   { label: 'Reviews', icon: <FiStar />, href: '/admin/reviews' },
   { label: 'Inventory', icon: <FiPackage />, href: '/admin/inventory' },
-  { label: 'Coupons', icon: <FiPercent />, href: '/admin/coupons' },
   { label: 'Payments', icon: <FiCreditCard />, href: '/admin/payments' },
   { label: 'SEO Manager', icon: <FiSearch />, href: '/admin/seo' },
   { label: 'Settings', icon: <FiSettings />, href: '/admin/settings' },
@@ -25,7 +24,29 @@ const menuItems = [
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [adminName, setAdminName] = useState('Admin');
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user?.name) setAdminName(data.user.name);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } finally {
+      router.push('/account');
+      router.refresh();
+    }
+  };
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F4F5FA' }}>
@@ -35,51 +56,60 @@ export default function AdminLayout({ children }) {
         backgroundColor: 'var(--primary)',
         color: 'white',
         transition: 'width 0.3s',
-        overflow: 'hidden',
         flexShrink: 0,
         position: 'sticky',
         top: 0,
         height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
       }}>
-        <div style={{ padding: '20px 16px', borderBottom: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '6px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Image src="/logo.png" alt="Furr & Feather's Hospital" width={220} height={70} style={{ objectFit: 'contain', width: '120px', height: '38px' }} />
-          </div>
-          <div style={{ whiteSpace: 'nowrap' }}>
-            <div style={{ fontWeight: '800', fontSize: '14px' }}>Furr & Feather's</div>
-            <div style={{ fontSize: '11px', opacity: 0.75 }}>Admin Panel</div>
+        {/* Logo — fixed at top, never scrolls */}
+        <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Image src="/logo.PNG" alt="Furr & Feather's Hospital" width={400} height={120} style={{ objectFit: 'contain', width: '180px', height: 'auto' }} />
           </div>
         </div>
 
-        <nav style={{ padding: '16px 12px' }}>
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '11px 14px', borderRadius: '8px', marginBottom: '4px',
-                  backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : 'transparent',
-                  color: 'white', fontSize: '14px', fontWeight: isActive ? '600' : '400',
-                  transition: 'background 0.2s', whiteSpace: 'nowrap',
-                }}
-                  onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; }}
-                  onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}>
-                  <span style={{ fontSize: '17px', display: 'flex' }}>{item.icon}</span>
-                  {item.label}
-                </div>
-              </Link>
-            );
-          })}
+        {/* Nav — scrollable, logout pinned at bottom */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <nav style={{ flex: 1, overflowY: 'auto', padding: '16px 12px 8px', scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) transparent' }}>
+            {menuItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: '12px',
+                    padding: '11px 14px', borderRadius: '8px', marginBottom: '4px',
+                    backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : 'transparent',
+                    color: 'white', fontSize: '14px', fontWeight: isActive ? '600' : '400',
+                    transition: 'background 0.2s', whiteSpace: 'nowrap',
+                  }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}>
+                    <span style={{ fontSize: '17px', display: 'flex' }}>{item.icon}</span>
+                    {item.label}
+                  </div>
+                </Link>
+              );
+            })}
+          </nav>
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', marginTop: '12px', paddingTop: '12px' }}>
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '11px 14px', borderRadius: '8px', color: 'white', fontSize: '14px' }}>
-                <FiLogOut size={17} /> Logout
-              </div>
-            </Link>
+          {/* Logout — always visible at bottom, never hidden */}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', padding: '12px', flexShrink: 0 }}>
+            <button onClick={handleLogout} disabled={loggingOut}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '12px', width: '100%',
+                padding: '11px 14px', borderRadius: '8px', color: 'white', fontSize: '14px',
+                background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+                opacity: loggingOut ? 0.6 : 1, whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'}
+              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+              <FiLogOut size={17} /> {loggingOut ? 'Logging out...' : 'Logout'}
+            </button>
           </div>
-        </nav>
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -90,8 +120,10 @@ export default function AdminLayout({ children }) {
             {sidebarOpen ? <FiX /> : <FiMenu />}
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Welcome back, Admin 👋</span>
-            <div style={{ backgroundColor: 'var(--primary)', color: 'white', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '14px' }}>A</div>
+            <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Welcome back, {adminName} 👋</span>
+            <div style={{ backgroundColor: 'var(--primary)', color: 'white', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '14px' }}>
+              {adminName.charAt(0).toUpperCase()}
+            </div>
           </div>
         </div>
 

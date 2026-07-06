@@ -256,9 +256,9 @@ export default function ShopPage() {
                           <span style={{ backgroundColor: '#ef4444', color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: '700' }}>Out of Stock</span>
                         </div>
                       ) : null}
-                      {product.discountPrice > 0 && product.discountPrice > product.price && (
+                      {product.discountPrice > 0 && product.discountPrice < product.price && (
                         <span style={{ position: 'absolute', top: '8px', right: '8px', backgroundColor: '#ef4444', color: 'white', padding: '3px 8px', borderRadius: '20px', fontSize: '11px', fontWeight: '700' }}>
-                          -{Math.round((1 - product.price / product.discountPrice) * 100)}%
+                          -{Math.round((1 - product.discountPrice / product.price) * 100)}%
                         </span>
                       )}
                     </div>
@@ -274,9 +274,11 @@ export default function ShopPage() {
                         <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>({product.numReviews || 0})</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--primary)' }}>Rs. {product.price.toLocaleString()}</span>
-                        {product.discountPrice > product.price && (
-                          <span style={{ fontSize: '10px', color: 'var(--text-muted)', textDecoration: 'line-through' }}>Rs. {product.discountPrice.toLocaleString()}</span>
+                        <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--primary)' }}>
+                          Rs. {(product.discountPrice > 0 && product.discountPrice < product.price ? product.discountPrice : product.price).toLocaleString()}
+                        </span>
+                        {product.discountPrice > 0 && product.discountPrice < product.price && (
+                          <span style={{ fontSize: '10px', color: 'var(--text-muted)', textDecoration: 'line-through' }}>Rs. {product.price.toLocaleString()}</span>
                         )}
                       </div>
                       <button

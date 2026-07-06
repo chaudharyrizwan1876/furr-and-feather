@@ -100,6 +100,11 @@ export default function EditProductPage({ params }) {
       return;
     }
 
+    if (form.discountPrice && Number(form.discountPrice) >= Number(form.price)) {
+      setError('Discounted price must be lower than the original Price');
+      return;
+    }
+
     let validVariants = [];
     if (hasVariants) {
       validVariants = variants.filter(v => v.label && v.price && v.stock !== '');
@@ -264,13 +269,15 @@ export default function EditProductPage({ params }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Price (Rs.) *</label>
-                <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="2450"
+                <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="2800"
                   style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '14px' }} />
+                <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Original price (MRP)</p>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Discount Price (Rs.)</label>
-                <input type="number" name="discountPrice" value={form.discountPrice} onChange={handleChange} placeholder="2800"
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Discounted Price (Rs.)</label>
+                <input type="number" name="discountPrice" value={form.discountPrice} onChange={handleChange} placeholder="2450"
                   style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '14px' }} />
+                <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Leave empty if no discount</p>
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Stock Quantity *</label>

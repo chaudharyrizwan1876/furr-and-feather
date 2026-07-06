@@ -1,17 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-
-const blogPosts = [
-  { id: 1, title: 'Best Deworming Medicine for Dogs in Pakistan', slug: 'best-deworming-medicine-for-dogs', excerpt: 'Complete guide to choosing the right deworming medicine for your dog based on age, weight and breed.', category: 'Dog Care', date: 'May 18, 2024', image: '🐕', author: 'Admin' },
-  { id: 2, title: 'Cat Vaccination Schedule: Complete Guide', slug: 'cat-vaccination-schedule', excerpt: 'Everything you need to know about vaccinating your cat from kitten to adult age.', category: 'Cat Care', date: 'May 15, 2024', image: '🐈', author: 'Admin' },
-  { id: 3, title: 'How to Remove Fleas from Cats at Home', slug: 'remove-fleas-from-cats', excerpt: 'Simple and effective home remedies combined with vet-approved treatments to get rid of fleas.', category: 'Cat Care', date: 'May 10, 2024', image: '🐈', author: 'Admin' },
-  { id: 4, title: 'Dog Skin Infection Treatment Guide', slug: 'dog-skin-infection-treatment', excerpt: 'Identify symptoms of skin infections in dogs and learn the best treatment options available.', category: 'Dog Care', date: 'May 8, 2024', image: '🐕', author: 'Admin' },
-  { id: 5, title: 'Common Bird Diseases and Prevention', slug: 'common-bird-diseases', excerpt: 'Learn about the most common diseases affecting pet birds and how to prevent them.', category: 'Bird Care', date: 'May 5, 2024', image: '🦜', author: 'Admin' },
-  { id: 6, title: 'Best Supplements For Pets in 2024', slug: 'best-supplements-for-pets', excerpt: 'A complete roundup of the most effective and vet-recommended supplements for pet health.', category: 'General', date: 'May 1, 2024', image: '💊', author: 'Admin' },
-];
-
-const categories = ['All', 'Dog Care', 'Cat Care', 'Bird Care', 'General'];
+import { blogPosts, blogCategories } from '@/data/blogPosts';
 
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -31,7 +21,7 @@ export default function BlogPage() {
       <div className="container" style={{ padding: '32px 20px' }}>
         {/* Category Filter */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '28px', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {categories.map((cat) => (
+          {blogCategories.map((cat) => (
             <button key={cat} onClick={() => setSelectedCategory(cat)}
               style={{ padding: '8px 20px', borderRadius: '20px', border: `2px solid ${selectedCategory === cat ? 'var(--primary)' : 'var(--border)'}`, backgroundColor: selectedCategory === cat ? 'var(--primary)' : 'white', color: selectedCategory === cat ? 'white' : 'var(--text)', fontWeight: '600', cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s' }}>
               {cat}

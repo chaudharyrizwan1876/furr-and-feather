@@ -10,10 +10,6 @@ export default function CartPage() {
   const removeItem = useCartStore((state) => state.removeItem);
   const getSubtotal = useCartStore((state) => state.getSubtotal);
 
-  const [couponCode, setCouponCode] = useState('');
-  const [discount, setDiscount] = useState(0);
-  const [couponMsg, setCouponMsg] = useState('');
-
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
@@ -26,20 +22,7 @@ export default function CartPage() {
 
   const subtotal = getSubtotal();
   const shipping = subtotal === 0 ? 0 : 300;
-  const total = subtotal + shipping - discount;
-
-  const applyCoupon = () => {
-    if (couponCode.toUpperCase() === 'WELCOME10') {
-      setDiscount(Math.round(subtotal * 0.1));
-      setCouponMsg('✅ 10% discount applied!');
-    } else if (couponCode.toUpperCase() === 'FREESHIP') {
-      setDiscount(150);
-      setCouponMsg('✅ Free shipping applied!');
-    } else {
-      setDiscount(0);
-      setCouponMsg('❌ Invalid coupon code');
-    }
-  };
+  const total = subtotal + shipping;
 
   return (
     <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
@@ -72,7 +55,7 @@ export default function CartPage() {
                 </h2>
 
                 {items.map((item, index) => (
-                  <div key={item.productId}>
+                  <div key={`${item.productId}-${item.variantId || 'base'}`}>
                     <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr auto', gap: '12px', alignItems: 'center', padding: '14px 0' }}
                       data-cart-item>
                       {/* Image */}
@@ -82,13 +65,16 @@ export default function CartPage() {
 
                       {/* Info */}
                       <div>
-                        <h3 style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px', lineHeight: '1.4' }}>{item.name}</h3>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                        <h3 style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '4px', lineHeight: '1.4' }}>{item.name}</h3>
+                        {item.variantLabel && (
+                          <p style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '600', marginBottom: '8px' }}>{item.variantLabel}</p>
+                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginTop: item.variantLabel ? 0 : '8px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', border: '2px solid var(--border)', borderRadius: '8px', overflow: 'hidden' }}>
-                            <button onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                            <button onClick={() => updateQuantity(item.productId, item.variantId, item.quantity - 1)}
                               style={{ padding: '4px 10px', border: 'none', backgroundColor: 'var(--bg)', cursor: 'pointer', fontWeight: '700' }}>-</button>
                             <span style={{ padding: '4px 10px', fontWeight: '700' }}>{item.quantity}</span>
-                            <button onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                            <button onClick={() => updateQuantity(item.productId, item.variantId, item.quantity + 1)}
                               style={{ padding: '4px 10px', border: 'none', backgroundColor: 'var(--bg)', cursor: 'pointer', fontWeight: '700' }}>+</button>
                           </div>
                           <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Rs. {item.price.toLocaleString()} each</span>
@@ -100,7 +86,7 @@ export default function CartPage() {
                         <p style={{ fontSize: '15px', fontWeight: '700', color: 'var(--primary)', marginBottom: '6px' }}>
                           Rs. {(item.price * item.quantity).toLocaleString()}
                         </p>
-                        <button onClick={() => removeItem(item.productId)}
+                        <button onClick={() => removeItem(item.productId, item.variantId)}
                           style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}>
                           🗑️ Remove
                         </button>
@@ -126,33 +112,16 @@ export default function CartPage() {
                 {[
                   { label: 'Subtotal', value: `Rs. ${subtotal.toLocaleString()}` },
                   { label: 'Shipping', value: shipping === 0 ? 'FREE' : `Rs. ${shipping}` },
-                  ...(discount > 0 ? [{ label: 'Discount', value: `-Rs. ${discount}` }] : []),
                 ].map((row) => (
                   <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '14px' }}>
                     <span style={{ color: 'var(--text-muted)' }}>{row.label}</span>
-                    <span style={{ fontWeight: '600', color: row.label === 'Discount' ? '#16a34a' : 'var(--text)' }}>{row.value}</span>
+                    <span style={{ fontWeight: '600', color: 'var(--text)' }}>{row.value}</span>
                   </div>
                 ))}
                 <div style={{ borderTop: '2px solid var(--border)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', fontSize: '17px', fontWeight: '800' }}>
                   <span>Total</span>
                   <span style={{ color: 'var(--primary)' }}>Rs. {total.toLocaleString()}</span>
                 </div>
-              </div>
-
-              
-
-              <div style={{ marginBottom: '18px' }}>
-                <p style={{ fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>Coupon Code</p>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input type="text" placeholder="Enter code" value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    style={{ flex: 1, minWidth: 0, padding: '9px 10px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '13px' }} />
-                  <button onClick={applyCoupon}
-                    style={{ padding: '9px 12px', borderRadius: '8px', border: 'none', backgroundColor: 'var(--primary)', color: 'white', fontWeight: '600', cursor: 'pointer', fontSize: '12px', whiteSpace: 'nowrap' }}>
-                    Apply
-                  </button>
-                </div>
-                {couponMsg && <p style={{ fontSize: '12px', marginTop: '6px', color: couponMsg.startsWith('✅') ? '#16a34a' : '#ef4444' }}>{couponMsg}</p>}
               </div>
 
               <Link href="/checkout" className="btn-primary" style={{ display: 'block', textAlign: 'center', padding: '14px', fontSize: '15px', fontWeight: '700' }}>

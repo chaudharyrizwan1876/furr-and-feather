@@ -11,6 +11,8 @@ const orderSchema = new mongoose.Schema(
     orderItems: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+        variantId: { type: mongoose.Schema.Types.ObjectId }, // agar product ka specific variant kharida gaya ho
+        variantLabel: { type: String }, // e.g. "4.5-10kg" — display ke liye
         name: { type: String, required: true },
         image: { type: String },
         price: { type: Number, required: true },

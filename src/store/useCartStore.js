@@ -1,20 +1,30 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// Cart mein har item ko uniquely identify karne ke liye productId + variantId
+// dono use karte hain. Agar product ka koi variant nahi hai, variantId null
+// rehta hai. Yeh zaroori hai taake ek hi product ke 2 alag variants (jaise
+// Bravecto 4.5-10kg aur 40-56kg) alag-alag cart line items rahein, na ke
+// galti se merge ho jayein.
+const getItemKey = (productId, variantId) => `${productId}__${variantId || 'base'}`;
+
 const useCartStore = create(
   persist(
     (set, get) => ({
       items: [],
 
-      // Cart mein product add karo
-      addItem: (product, quantity = 1) => {
+      // Cart mein product add karo. variantId/variantLabel optional hain —
+      // jab product ka koi specific variant select kiya gaya ho tab pass karo.
+      addItem: (product, quantity = 1, variant = null) => {
         const items = get().items;
-        const existing = items.find((item) => item.productId === product._id);
+        const variantId = variant?._id || null;
+        const itemKey = getItemKey(product._id, variantId);
+        const existing = items.find((item) => getItemKey(item.productId, item.variantId) === itemKey);
 
         let newItems;
         if (existing) {
           newItems = items.map((item) =>
-            item.productId === product._id
+            getItemKey(item.productId, item.variantId) === itemKey
               ? { ...item, quantity: item.quantity + quantity }
               : item
           );
@@ -23,37 +33,41 @@ const useCartStore = create(
             ...items,
             {
               productId: product._id,
+              variantId: variantId,
+              variantLabel: variant?.label || null,
               name: product.name,
-              price: product.price,
+              price: variant ? variant.price : product.price,
               image: product.images && product.images[0] ? product.images[0] : null,
               quantity: quantity,
-              stock: product.stock,
+              stock: variant ? variant.stock : product.stock,
             },
           ];
         }
         set({ items: newItems, totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0) });
       },
 
-      // Quantity update karo
-      // Quantity update karo
-      updateQuantity: (productId, quantity) => {
+      // Quantity update karo — productId + variantId dono se match karo
+      updateQuantity: (productId, variantId, quantity) => {
         if (quantity < 1) return;
         const newItems = get().items.map((item) =>
-          item.productId === productId ? { ...item, quantity } : item
+          getItemKey(item.productId, item.variantId) === getItemKey(productId, variantId)
+            ? { ...item, quantity }
+            : item
         );
         set({ items: newItems, totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0) });
       },
 
-      // Item remove karo
-      removeItem: (productId) => {
-        const newItems = get().items.filter((item) => item.productId !== productId);
+      // Item remove karo — productId + variantId dono se match karo
+      removeItem: (productId, variantId) => {
+        const newItems = get().items.filter(
+          (item) => getItemKey(item.productId, item.variantId) !== getItemKey(productId, variantId)
+        );
         set({ items: newItems, totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0) });
       },
 
       // Cart khali karo (order place hone ke baad)
       clearCart: () => set({ items: [], totalItems: 0 }),
 
-      // Total items count (Navbar badge ke liye)
       // Total items count (Navbar badge ke liye)
       totalItems: 0,
       getTotalItems: () => {

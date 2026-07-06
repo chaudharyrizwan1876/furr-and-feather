@@ -13,7 +13,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div style={{ height: '48px', width: '220px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', overflow: 'visible', marginBottom: '14px', borderRadius: '8px', padding: '4px 8px', position: 'relative' }}>
-              <Image src="/footer.png" alt="Furr & Feather's Hospital" width={400} height={120} style={{ objectFit: 'contain', width: '210px', height: 'auto', position: 'absolute', left: 0 }} />
+              <Image src="/footer.PNG" alt="Furr & Feather's Hospital" width={400} height={120} style={{ objectFit: 'contain', width: '210px', height: 'auto', position: 'absolute', left: 0 }} />
             </div>
             <p style={{ opacity: 0.8, fontSize: '13px', lineHeight: '1.6', marginBottom: '14px' }}>
               Trusted veterinary medicines & pet care products. Genuine products, fast delivery all over Pakistan.

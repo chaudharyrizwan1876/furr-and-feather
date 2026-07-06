@@ -26,6 +26,7 @@ const productSchema = new mongoose.Schema(
     isActive: { type: Boolean, default: true },
     rating: { type: Number, default: 0 },
     numReviews: { type: Number, default: 0 },
+    numSold: { type: Number, default: 0 }, // Kitni baar bik chuka hai - har order par automatically increment hota hai
     metaTitle: { type: String },
     metaDescription: { type: String },
     focusKeyword: { type: String },

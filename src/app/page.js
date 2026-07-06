@@ -37,12 +37,6 @@ const whyChooseUs = [
   { icon: <FiHeart size={36} />, title: 'Vet Recommended', desc: 'Products recommended by certified veterinary doctors' },
 ];
 
-const testimonials = [
-  { name: 'Ali Raza', city: 'Lahore', review: 'Bravecto original mila, delivery bhi fast thi. Bahut khush hoon!', rating: 5 },
-  { name: 'Sana Khan', city: 'Karachi', review: 'Genuine products milte hain yahan. Meri billi ke liye best supplements order kiye.', rating: 5 },
-  { name: 'Usman Iqbal', city: 'Islamabad', review: 'COD ka option bahut acha hai. Trust karne wali shop hai.', rating: 4 },
-];
-
 function StarRating({ rating }) {
   return (
     <div style={{ display: 'flex', gap: '2px' }}>
@@ -54,7 +48,8 @@ function StarRating({ rating }) {
 }
 
 function ProductCard({ product, addItem }) {
-  const hasDiscount = product.discountPrice > product.price;
+  const hasDiscount = product.discountPrice > 0 && product.discountPrice < product.price;
+  const discountPercent = hasDiscount ? Math.round((1 - product.discountPrice / product.price) * 100) : 0;
   return (
     <div style={{ backgroundColor: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', transition: 'transform 0.3s, box-shadow 0.3s', cursor: 'pointer' }}
       onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(47,125,58,0.15)'; }}
@@ -69,7 +64,7 @@ function ProductCard({ product, addItem }) {
           )}
           {hasDiscount && (
             <span style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: '#ef4444', color: 'white', padding: '3px 8px', borderRadius: '20px', fontSize: '11px', fontWeight: '700' }}>
-              -{Math.round((1 - product.price / product.discountPrice) * 100)}%
+              -{discountPercent}%
             </span>
           )}
         </div>
@@ -81,9 +76,9 @@ function ProductCard({ product, addItem }) {
             <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>({product.numReviews || 0})</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-            <span style={{ fontSize: '18px', fontWeight: '700', color: 'var(--primary)' }}>Rs. {product.price.toLocaleString()}</span>
+            <span style={{ fontSize: '18px', fontWeight: '700', color: 'var(--primary)' }}>Rs. {(hasDiscount ? product.discountPrice : product.price).toLocaleString()}</span>
             {hasDiscount && (
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'line-through' }}>Rs. {product.discountPrice.toLocaleString()}</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)', textDecoration: 'line-through' }}>Rs. {product.price.toLocaleString()}</span>
             )}
           </div>
         </div>
@@ -104,6 +99,7 @@ export default function HomePage() {
   const [categoryImages, setCategoryImages] = useState({});
   const [categoryCounts, setCategoryCounts] = useState({});
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -133,6 +129,16 @@ export default function HomePage() {
 
       const featured = allProducts.filter((p) => p.isFeatured);
       setFeaturedProducts(featured.slice(0, 8));
+
+      // Home page testimonials — real approved reviews se, latest pehle.
+      // Pehle 5-star products ke reviews dikhao, phir baqi se fill karo (max 4)
+      const reviewsRes = await fetch('/api/reviews?approved=true');
+      const allReviews = await reviewsRes.json();
+
+      const fiveStarReviews = allReviews.filter((r) => r.product?.rating === 5);
+      const otherReviews = allReviews.filter((r) => r.product?.rating !== 5);
+      const combined = [...fiveStarReviews, ...otherReviews].slice(0, 4);
+      setTestimonials(combined);
     } catch (err) {
       console.error('Home data fetch nahi hui', err);
     } finally {
@@ -173,11 +179,19 @@ export default function HomePage() {
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', transform: 'scale(1.15)' }}
             data-hero-image-wrap>
             <Image
-              src="/pets-hero.png"
+              src="/petsss.png"
               alt="Happy pets at Furr & Feather's Hospital"
               width={1100}
               height={1100}
-              style={{ width: '100%', maxWidth: '950px', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 15px 35px rgba(0,0,0,0.15))' }}
+              style={{
+                width: '100%',
+                maxWidth: '950px',
+                height: 'auto',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 15px 35px rgba(0,0,0,0.15))',
+                WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 6%, black 16%)',
+                maskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 6%, black 16%)',
+              }}
               priority
             />
           </div>
@@ -286,37 +300,41 @@ export default function HomePage() {
             <h3 style={{ fontWeight: '700', fontSize: '20px', marginBottom: '6px' }}>Need Help? Chat with our Pet Care Experts</h3>
             <p style={{ opacity: 0.9, fontSize: '14px' }}>Available 9 AM to 9 PM, Monday to Saturday</p>
           </div>
-          <a href="https://wa.me/923001234567" target="_blank" style={{ backgroundColor: 'white', color: '#25D366', padding: '12px 28px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <a href="https://wa.me/923295780676" target="_blank" style={{ backgroundColor: 'white', color: '#25D366', padding: '12px 28px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <FaWhatsapp size={18} /> Chat on WhatsApp
           </a>
         </div>
       </section>
 
       {/* ===== TESTIMONIALS ===== */}
-      <section style={{ padding: '60px 20px', backgroundColor: 'var(--bg)' }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <h2 className="section-title">What Our Customers Say</h2>
-          <p className="section-subtitle">Thousands of happy pet owners trust us</p>
+      {testimonials.length > 0 && (
+        <section style={{ padding: '60px 20px', backgroundColor: 'var(--bg)' }}>
+          <div className="container" style={{ textAlign: 'center' }}>
+            <h2 className="section-title">What Our Customers Say</h2>
+            <p className="section-subtitle">Thousands of happy pet owners trust us</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '20px' }}>
-            {testimonials.map((t, i) => (
-              <div key={i} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '28px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', textAlign: 'left' }}>
-                <StarRating rating={t.rating} />
-                <p style={{ color: 'var(--text)', lineHeight: '1.7', margin: '14px 0', fontSize: '14px' }}>"{t.review}"</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ backgroundColor: 'var(--primary)', borderRadius: '50%', width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '700', fontSize: '16px' }}>
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: '700', fontSize: '14px' }}>{t.name}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.city}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '20px' }}>
+              {testimonials.map((t) => (
+                <div key={t._id} style={{ backgroundColor: 'white', borderRadius: '12px', padding: '28px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', textAlign: 'left' }}>
+                  <StarRating rating={t.rating} />
+                  <p style={{ color: 'var(--text)', lineHeight: '1.7', margin: '14px 0', fontSize: '14px' }}>"{t.comment}"</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ backgroundColor: 'var(--primary)', borderRadius: '50%', width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '700', fontSize: '16px', flexShrink: 0 }}>
+                      {t.customerName[0]}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: '700', fontSize: '14px' }}>{t.customerName}</div>
+                      {t.product?.name && (
+                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>on {t.product.name}</div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <style jsx>{`
         @media (max-width: 968px) {
