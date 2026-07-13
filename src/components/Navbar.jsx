@@ -35,7 +35,7 @@ export default function Navbar() {
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', marginLeft: '-30px' }} className="navbar-logo-link">
           <div style={{ height: '72px', width: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}
             className="navbar-logo-box">
-            <Image src="/logo.PNG" alt="Furr & Feather's Hospital" width={320} height={144} style={{ objectFit: 'contain', width: '240px', height: 'auto' }} />
+            <Image src="/logo.png" alt="Furr & Feather's Hospital" width={320} height={144} priority style={{ objectFit: 'contain', width: '240px', height: 'auto' }} />
           </div>
         </Link>
 

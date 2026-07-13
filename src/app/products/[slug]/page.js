@@ -101,6 +101,36 @@ export default function ProductDetailPage({ params }) {
   };
   const getActiveStock = () => selectedVariant ? selectedVariant.stock : product.stock;
 
+  // Google Rich Results ke liye JSON-LD Product Schema
+  // NOTE: yeh hasDiscount/getActiveStock ke BAAD hona zaroori hai, warna
+  // "Cannot access before initialization" error aata hai
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.shortDescription || product.description || '',
+    image: product.images || [],
+    brand: { '@type': 'Brand', name: product.brand || "Furr & Feather's Hospital" },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'PKR',
+      price: hasDiscount ? product.discountPrice : product.price,
+      availability: getActiveStock() > 0
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: { '@type': 'Organization', name: "Furr & Feather's Hospital" },
+    },
+    ...(product.numReviews > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: product.rating,
+        reviewCount: product.numReviews,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    }),
+  };
+
   const handleAddToCart = () => {
     addItem(product, quantity, selectedVariant);
     const label = selectedVariant ? `${product.name} (${selectedVariant.label})` : product.name;
@@ -149,6 +179,11 @@ export default function ProductDetailPage({ params }) {
 
   return (
     <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
+      {/* JSON-LD Schema — Google Rich Results ke liye */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
       {/* Breadcrumb */}
       <div style={{ backgroundColor: 'white', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
@@ -183,7 +218,7 @@ export default function ProductDetailPage({ params }) {
           <div>
             <div style={{ backgroundColor: 'var(--bg)', borderRadius: '12px', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '90px', marginBottom: '14px', overflow: 'hidden' }}>
               {images ? (
-                <img src={images[selectedImage]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={images[selectedImage]} alt={product.name} loading="eager" fetchPriority="high" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <span>📦</span>
               )}
@@ -193,7 +228,7 @@ export default function ProductDetailPage({ params }) {
                 {images.map((img, i) => (
                   <div key={i} onClick={() => setSelectedImage(i)}
                     style={{ width: '64px', height: '64px', backgroundColor: 'var(--bg)', borderRadius: '8px', overflow: 'hidden', cursor: 'pointer', border: `2px solid ${selectedImage === i ? 'var(--primary)' : 'var(--border)'}` }}>
-                    <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={img} alt={`${product.name} view ${i + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 ))}
               </div>
@@ -445,7 +480,7 @@ export default function ProductDetailPage({ params }) {
                     onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
                     onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
                     <div style={{ backgroundColor: 'var(--bg)', height: '110px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px', overflow: 'hidden' }}>
-                      {p.images && p.images[0] ? <img src={p.images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📦'}
+                      {p.images && p.images[0] ? <img src={p.images[0]} alt={p.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📦'}
                     </div>
                     <div style={{ padding: '12px' }}>
                       <h3 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</h3>

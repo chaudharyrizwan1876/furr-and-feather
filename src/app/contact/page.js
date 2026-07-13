@@ -29,8 +29,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <div className="container" style={{ padding: '40px 20px', display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '28px', alignItems: 'start' }}
-        data-contact-grid>
+      <div className="container" style={{ padding: '40px 20px', display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '28px', alignItems: 'start' }}>
 
         {/* Contact Info */}
         <div>
@@ -38,7 +37,7 @@ export default function ContactPage() {
             <h3 style={{ fontWeight: '700', fontSize: '18px', color: 'var(--primary)', marginBottom: '20px' }}>Get In Touch</h3>
 
             {[
-              { icon: <FiMapPin size={20} />, title: 'Address', value: 'Rawalpindi, Punjab, Pakistan' },
+              { icon: <FiMapPin size={20} />, title: 'Address', value: '123 Veterinary Street, Lahore, Pakistan' },
               { icon: <FiPhone size={20} />, title: 'Phone', value: '0300-1234567' },
               { icon: <FiMail size={20} />, title: 'Email', value: 'info@furrandfeathers.com' },
               { icon: <FiClock size={20} />, title: 'Working Hours', value: '9 AM - 9 PM, Mon - Sat' },
@@ -60,7 +59,7 @@ export default function ContactPage() {
             <FaWhatsapp size={36} style={{ marginBottom: '10px' }} />
             <h3 style={{ fontWeight: '700', fontSize: '16px', marginBottom: '6px' }}>Chat With Us Instantly</h3>
             <p style={{ fontSize: '13px', opacity: 0.9, marginBottom: '16px' }}>Get quick answers on WhatsApp</p>
-            <a href="https://wa.me/923295780676" target="_blank" style={{ backgroundColor: 'white', color: '#25D366', padding: '10px 24px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '14px', display: 'inline-block' }}>
+            <a href="https://wa.me/923001234567" target="_blank" style={{ backgroundColor: 'white', color: '#25D366', padding: '10px 24px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '14px', display: 'inline-block' }}>
               Open WhatsApp
             </a>
           </div>
@@ -109,14 +108,6 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @media (max-width: 768px) {
-          [data-contact-grid] {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

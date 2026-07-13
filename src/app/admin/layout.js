@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  FiGrid, FiBox, FiTag, FiShoppingBag, FiUsers, FiFileText,
+  FiGrid, FiBox, FiTag, FiShoppingBag, FiUsers,
   FiStar, FiPackage, FiCreditCard, FiSearch, FiSettings, FiLogOut, FiMenu, FiX
 } from 'react-icons/fi';
 
@@ -14,7 +14,6 @@ const menuItems = [
   { label: 'Categories', icon: <FiTag />, href: '/admin/categories' },
   { label: 'Orders', icon: <FiShoppingBag />, href: '/admin/orders' },
   { label: 'Customers', icon: <FiUsers />, href: '/admin/customers' },
-  { label: 'Blog', icon: <FiFileText />, href: '/admin/blogs' },
   { label: 'Reviews', icon: <FiStar />, href: '/admin/reviews' },
   { label: 'Inventory', icon: <FiPackage />, href: '/admin/inventory' },
   { label: 'Payments', icon: <FiCreditCard />, href: '/admin/payments' },
@@ -67,7 +66,7 @@ export default function AdminLayout({ children }) {
         {/* Logo — fixed at top, never scrolls */}
         <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Image src="/logo.PNG" alt="Furr & Feather's Hospital" width={400} height={120} style={{ objectFit: 'contain', width: '180px', height: 'auto' }} />
+            <Image src="/footer.png" alt="Furr & Feather's Hospital" width={400} height={120} style={{ objectFit: 'contain', width: '180px', height: 'auto' }} />
           </div>
         </div>
 

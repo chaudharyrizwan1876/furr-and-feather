@@ -7,18 +7,16 @@ export default function AboutPage() {
       {/* Header */}
       <div style={{ backgroundColor: 'var(--primary)', color: 'white', padding: '24px 20px', textAlign: 'center' }}>
         <div className="container">
-          <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.7rem)', fontWeight: '800', marginBottom: '6px' }}>About Furr & Feather's Hospital</h1>
+          <h1 style={{ fontSize: '1.7rem', fontWeight: '800', marginBottom: '6px' }}>About Furr & Feather's Hospital</h1>
           <p style={{ opacity: 0.85, fontSize: '13px', maxWidth: '600px', margin: '0 auto' }}>
             Pakistan's trusted destination for genuine veterinary medicines and pet care products
           </p>
         </div>
       </div>
 
-      <div className="container" style={{ padding: '50px 20px' }}
-        data-about-container>
+      <div className="container" style={{ padding: '50px 20px' }}>
         {/* Story Section */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'center', marginBottom: '60px' }}
-          data-story-grid>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'center', marginBottom: '60px' }}>
           <div>
             <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '18px' }}>Our Story</h2>
             <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--text)', marginBottom: '16px' }}>
@@ -28,8 +26,7 @@ export default function AboutPage() {
               As a team led by a qualified veterinary doctor, we understand the importance of authentic products and proper guidance when it comes to your pet's health. We've built this platform to bridge the gap between trusted veterinary care and everyday pet owners across the country.
             </p>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', fontSize: '140px' }}
-            data-story-emoji>
+          <div style={{ display: 'flex', justifyContent: 'center', fontSize: '140px' }}>
             🏥
           </div>
         </div>
@@ -51,8 +48,7 @@ export default function AboutPage() {
         </div>
 
         {/* Mission & Vision */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '60px' }}
-          data-mv-grid>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '60px' }}>
           <div style={{ backgroundColor: 'white', borderRadius: '14px', padding: '32px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
             <div style={{ fontSize: '36px', marginBottom: '16px' }}>🎯</div>
             <h3 style={{ fontWeight: '700', fontSize: '18px', color: 'var(--primary)', marginBottom: '12px' }}>Our Mission</h3>
@@ -88,27 +84,6 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @media (max-width: 768px) {
-          [data-story-grid] {
-            grid-template-columns: 1fr !important;
-            text-align: center;
-          }
-          [data-story-emoji] {
-            font-size: 90px !important;
-            order: -1;
-          }
-          [data-mv-grid] {
-            grid-template-columns: 1fr !important;
-          }
-        }
-        @media (max-width: 480px) {
-          [data-about-container] {
-            padding: 32px 16px !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

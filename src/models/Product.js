@@ -10,14 +10,14 @@ const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
-    description: { type: String, required: true },
+    description: { type: String },
     shortDescription: { type: String },
-    price: { type: Number, required: true }, // Base price (agar variants nahi hain) ya sabse kam variant price
+    price: { type: Number, required: true },
     discountPrice: { type: Number },
     category: { type: String, required: true },
     brand: { type: String },
     images: [{ type: String }],
-    stock: { type: Number, required: true, default: 0 }, // Sirf tab use hoga jab variants nahi hain
+    stock: { type: Number, default: 0 },
     sku: { type: String },
     unit: { type: String },
     suitableFor: { type: String },
@@ -27,6 +27,12 @@ const productSchema = new mongoose.Schema(
     rating: { type: Number, default: 0 },
     numReviews: { type: Number, default: 0 },
     numSold: { type: Number, default: 0 }, // Kitni baar bik chuka hai - har order par automatically increment hota hai
+
+    // Manual ordering ke liye — Admin isay control karta hai up/down arrows se.
+    // Chhota number = pehle dikhega.
+    sortOrder: { type: Number, default: 0 },       // Shop page ka order
+    featuredOrder: { type: Number, default: 0 },   // Home page ke "Featured Products" ka order (alag rakha gaya hai taake Shop page ke order se conflict na ho)
+
     metaTitle: { type: String },
     metaDescription: { type: String },
     focusKeyword: { type: String },

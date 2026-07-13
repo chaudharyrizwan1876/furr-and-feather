@@ -58,7 +58,7 @@ function ProductCard({ product, addItem }) {
       <Link href={`/products/${product.slug}`} style={{ textDecoration: 'none' }}>
         <div style={{ backgroundColor: 'var(--bg)', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
           {product.images && product.images[0] ? (
-            <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={product.images[0]} alt={product.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             <span style={{ fontSize: '60px' }}>📦</span>
           )}
@@ -127,8 +127,14 @@ export default function HomePage() {
       setCategoryImages(images);
       setCategoryCounts(counts);
 
-      const featured = allProducts.filter((p) => p.isFeatured);
-      setFeaturedProducts(featured.slice(0, 8));
+      // Featured products — ab featuredOrder ke hisab se sorted hain.
+      // Admin panel (Products > Featured Products Order tab) se jo order
+      // set kiya jata hai, wahi order yahan follow hota hai.
+      // Chhota featuredOrder number = pehle dikhega.
+      const featured = allProducts
+        .filter((p) => p.isFeatured)
+        .sort((a, b) => (a.featuredOrder || 0) - (b.featuredOrder || 0) || a._id.localeCompare(b._id));
+      setFeaturedProducts(featured);
 
       // Home page testimonials — real approved reviews se, latest pehle.
       // Pehle 5-star products ke reviews dikhao, phir baqi se fill karo (max 4)
@@ -179,7 +185,7 @@ export default function HomePage() {
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', transform: 'scale(1.15)' }}
             data-hero-image-wrap>
             <Image
-              src="/petsss.png"
+              src="/petsss.PNG"
               alt="Happy pets at Furr & Feather's Hospital"
               width={1100}
               height={1100}
@@ -234,7 +240,7 @@ export default function HomePage() {
                 >
                   <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--bg)', margin: '0 auto 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                     {categoryImages[cat.slug] ? (
-                      <img src={categoryImages[cat.slug]} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={categoryImages[cat.slug]} alt={cat.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <span style={{ fontSize: '30px' }}>{cat.fallbackIcon}</span>
                     )}
@@ -266,7 +272,8 @@ export default function HomePage() {
               No featured products yet. Mark products as featured from the admin panel.
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '20px' }}
+              data-featured-grid>
               {featuredProducts.map((product) => (
                 <ProductCard key={product._id} product={product} addItem={addItem} />
               ))}
@@ -300,7 +307,7 @@ export default function HomePage() {
             <h3 style={{ fontWeight: '700', fontSize: '20px', marginBottom: '6px' }}>Need Help? Chat with our Pet Care Experts</h3>
             <p style={{ opacity: 0.9, fontSize: '14px' }}>Available 9 AM to 9 PM, Monday to Saturday</p>
           </div>
-          <a href="https://wa.me/923295780676" target="_blank" style={{ backgroundColor: 'white', color: '#25D366', padding: '12px 28px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <a href="https://wa.me/923001234567" target="_blank" style={{ backgroundColor: 'white', color: '#25D366', padding: '12px 28px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <FaWhatsapp size={18} /> Chat on WhatsApp
           </a>
         </div>
@@ -337,8 +344,16 @@ export default function HomePage() {
       )}
 
       <style jsx>{`
+        @media (max-width: 1200px) {
+          [data-featured-grid] {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        }
         @media (max-width: 968px) {
           [data-category-grid] {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+          [data-featured-grid] {
             grid-template-columns: repeat(3, 1fr) !important;
           }
           [data-hero-grid] {
@@ -356,6 +371,9 @@ export default function HomePage() {
         }
         @media (max-width: 600px) {
           [data-category-grid] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          [data-featured-grid] {
             grid-template-columns: repeat(2, 1fr) !important;
           }
           [data-hero-section] {
