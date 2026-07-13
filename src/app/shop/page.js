@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiFilter, FiX, FiArrowLeft } from 'react-icons/fi';
@@ -49,7 +49,7 @@ function FilterPanel({ selectedCategory, handleCategoryChange, priceRange, setPr
   );
 }
 
-export default function ShopPage() {
+function ShopContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
@@ -303,5 +303,26 @@ export default function ShopPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <LoadingSpinner text="Loading shop..." />
+        </div>
+      }
+    >
+      <ShopContent />
+    </Suspense>
   );
 }

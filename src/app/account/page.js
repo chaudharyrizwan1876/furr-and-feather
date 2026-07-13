@@ -1,11 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
-export default function AccountPage() {
+function AccountContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('login');
@@ -191,5 +191,25 @@ export default function AccountPage() {
         </div>
       </div>
     </div>
+  );
+}
+export default function AccountPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Loading...
+        </div>
+      }
+    >
+      <AccountContent />
+    </Suspense>
   );
 }
