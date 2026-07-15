@@ -20,7 +20,7 @@ const categories = [
   { name: 'Pain Relief & Symptomatic Care', slug: 'Pain Relief & Symptomatic Care', fallbackIcon: '💉' },
   { name: 'Skin & External Care', slug: 'Skin & External Care', fallbackIcon: '🧴' },
   { name: 'Equipment & Devices', slug: 'Equipment & Devices', fallbackIcon: '🔧' },
-  { name: 'Accessories', slug: 'Accessories', fallbackIcon: '🎾' },
+  { name: 'Accessories', slug: 'Accessories', fallbackIcon: '🦴' },
 ];
 
 const trustBadges = [
@@ -185,7 +185,7 @@ export default function HomePage() {
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', transform: 'scale(1.15)' }}
             data-hero-image-wrap>
             <Image
-              src="/petsss.png"
+              src="/petsss.PNG"
               alt="Happy pets at Furr & Feather's Hospital"
               width={1100}
               height={1100}
@@ -307,7 +307,7 @@ export default function HomePage() {
             <h3 style={{ fontWeight: '700', fontSize: '20px', marginBottom: '6px' }}>Need Help? Chat with our Pet Care Experts</h3>
             <p style={{ opacity: 0.9, fontSize: '14px' }}>Available 9 AM to 9 PM, Monday to Saturday</p>
           </div>
-          <a href="https://wa.me/923001234567" target="_blank" style={{ backgroundColor: 'white', color: '#25D366', padding: '12px 28px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <a href="https://wa.me/923295780676" target="_blank" style={{ backgroundColor: 'white', color: '#25D366', padding: '12px 28px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <FaWhatsapp size={18} /> Chat on WhatsApp
           </a>
         </div>
