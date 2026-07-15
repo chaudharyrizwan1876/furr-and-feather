@@ -185,7 +185,7 @@ export default function HomePage() {
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', transform: 'scale(1.15)' }}
             data-hero-image-wrap>
             <Image
-              src="/petsss.PNG"
+              src="/petsss.png"
               alt="Happy pets at Furr & Feather's Hospital"
               width={1100}
               height={1100}
