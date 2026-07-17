@@ -3,34 +3,44 @@ import Order from '@/models/Order';
 import Product from '@/models/Product';
 import { NextResponse } from 'next/server';
 
-// POST /api/orders — Order place karo (Guest ya Logged-in dono)
+// GET /api/orders — Sab orders fetch karo (admin ke liye)
+export async function GET(request) {
+  try {
+    await connectDB();
+    const orders = await Order.find({}).sort({ createdAt: -1 });
+    return NextResponse.json(orders);
+  } catch (error) {
+    return NextResponse.json({ message: error.message }, { status: 500 });
+  }
+}
+
+// POST /api/orders — Naya order place karo
 export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
-
     const {
-      customerId,
+      user, // logged-in ho to userId, warna null/undefined (guest)
+      orderItems,
       customerName,
       phone,
       email,
       address,
       city,
-      orderItems,
+      notes,
+      paymentMethod,
+      paymentScreenshot,
       subtotal,
       shippingCost,
       total,
-      paymentMethod,
-      paymentScreenshot,
-      notes,
     } = body;
 
-    if (!orderItems || orderItems.length === 0) {
-      return NextResponse.json({ message: 'Order items nahi hain' }, { status: 400 });
+    if (!customerName || !phone || !address || !city) {
+      return NextResponse.json({ message: 'Sab zaroori fields bharein' }, { status: 400 });
     }
 
-    if (!customerName || !phone || !address || !city) {
-      return NextResponse.json({ message: 'Zaroori fields missing hain' }, { status: 400 });
+    if (!orderItems || orderItems.length === 0) {
+      return NextResponse.json({ message: 'Cart khali hai' }, { status: 400 });
     }
 
     // Stock check karo (variant-specific ya base product, jo bhi applicable ho)
@@ -61,7 +71,6 @@ export async function POST(request) {
         const product = await Product.findById(item.product);
         const variant = product.variants.find((v) => v._id.toString() === item.variantId.toString());
         variant.stock -= item.quantity;
-        // Base stock ko bhi sync rakhte hain — variants ke total stock ka sum
         product.stock = product.variants.reduce((sum, v) => sum + v.stock, 0);
         product.numSold = (product.numSold || 0) + item.quantity;
         await product.save();
@@ -71,41 +80,22 @@ export async function POST(request) {
     }
 
     const order = await Order.create({
-      customer: customerId || null,
+      user: user || null,
+      orderItems,
       customerName,
       phone,
       email,
       address,
       city,
-      orderItems,
-      subtotal,
-      shippingCost: shippingCost || 300,
-      total,
+      notes,
       paymentMethod,
       paymentScreenshot,
-      notes,
+      subtotal,
+      shippingCost,
+      total,
     });
 
     return NextResponse.json(order, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
-  }
-}
-
-// GET /api/orders — Sab orders fetch karo (Admin ke liye)
-export async function GET(request) {
-  try {
-    await connectDB();
-
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-
-    let filter = {};
-    if (status) filter.orderStatus = status;
-
-    const orders = await Order.find(filter).sort({ createdAt: -1 });
-
-    return NextResponse.json(orders);
   } catch (error) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }

@@ -117,6 +117,19 @@ export default function CheckoutPage() {
 
     setLoading(true);
 
+    // Check karo ke user logged-in hai ya nahi, agar hai to uska ID le lo
+    // taake order account se link ho jaye (My Orders mein dikhe)
+    let loggedInUserId = null;
+    try {
+      const sessionRes = await fetch('/api/auth/me');
+      const sessionData = await sessionRes.json();
+      if (sessionData.user) {
+        loggedInUserId = sessionData.user.userId || null;
+      }
+    } catch (err) {
+      // Session check fail ho to guest ki tarah proceed karo, koi masla nahi
+    }
+
     try {
       const formData = new FormData();
       formData.append('image', screenshot);
@@ -142,7 +155,7 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerId: null,
+          user: loggedInUserId,
           customerName: form.name,
           phone: form.phone,
           email: form.email,

@@ -2,12 +2,10 @@ import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema(
   {
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    customerName: { type: String, required: true },
-    phone: { type: String, required: true },
-    email: { type: String },
-    address: { type: String, required: true },
-    city: { type: String, required: true },
+    // Agar order logged-in customer ne place kiya hai to uska User ID yahan save hota hai.
+    // Guest orders ke liye yeh field khali (null) rehta hai — unhe phone number se track kiya jata hai.
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+
     orderItems: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
@@ -19,26 +17,23 @@ const orderSchema = new mongoose.Schema(
         quantity: { type: Number, required: true },
       },
     ],
-    subtotal: { type: Number, required: true },
-    shippingCost: { type: Number, default: 150 },
-    total: { type: Number, required: true },
-    paymentMethod: {
-      type: String,
-      enum: ['COD', 'Easypaisa', 'JazzCash', 'BankTransfer'],
-      required: true,
-    },
-    paymentStatus: {
-      type: String,
-      enum: ['Pending', 'Verified', 'Rejected'],
-      default: 'Pending',
-    },
-    paymentScreenshot: { type: String },
-    orderStatus: {
-      type: String,
-      enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'],
-      default: 'Pending',
-    },
+
+    customerName: { type: String, required: true },
+    phone: { type: String, required: true },
+    email: { type: String },
+    address: { type: String, required: true },
+    city: { type: String, required: true },
     notes: { type: String },
+
+    paymentMethod: { type: String, enum: ['COD', 'Easypaisa', 'JazzCash', 'BankTransfer'], required: true },
+    paymentScreenshot: { type: String },
+    paymentStatus: { type: String, enum: ['Pending', 'Verified', 'Rejected'], default: 'Pending' },
+
+    subtotal: { type: Number, required: true },
+    shippingCost: { type: Number, required: true },
+    total: { type: Number, required: true },
+
+    orderStatus: { type: String, enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'], default: 'Pending' },
   },
   { timestamps: true }
 );

@@ -1,8 +1,9 @@
 'use client';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
+import { FiPackage, FiLogOut } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 function AccountContent() {
@@ -13,7 +14,23 @@ function AccountContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Session check — agar user pehle se logged-in hai to login form ki jagah
+  // "already logged in" wala view dikhayein
+  const [checkingSession, setCheckingSession] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loggingOut, setLoggingOut] = useState(false);
+
   const redirectTo = searchParams.get('redirect') || '/';
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) setCurrentUser(data.user);
+      })
+      .catch(() => {})
+      .finally(() => setCheckingSession(false));
+  }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -94,6 +111,59 @@ function AccountContent() {
       setLoading(false);
     }
   };
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setCurrentUser(null);
+      toast.success('Logout ho gaye');
+      router.refresh();
+    } finally {
+      setLoggingOut(false);
+    }
+  };
+
+  // Session check hone tak halka loading state
+  if (checkingSession) {
+    return (
+      <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: 'var(--text-muted)' }}>Loading...</p>
+      </div>
+    );
+  }
+
+  // Agar user pehle se logged-in hai — login form ki jagah yeh view dikhao
+  if (currentUser) {
+    return (
+      <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+        <div style={{ backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', width: '100%', maxWidth: '420px', padding: '36px 32px', textAlign: 'center' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px', fontWeight: '700', margin: '0 auto 16px' }}>
+            {currentUser.name?.charAt(0).toUpperCase()}
+          </div>
+          <h2 style={{ fontSize: '1.3rem', fontWeight: '800', color: 'var(--text)', marginBottom: '4px' }}>Welcome, {currentUser.name}!</h2>
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '24px' }}>{currentUser.email}</p>
+
+          <Link href="/account/orders" className="btn-primary"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '13px', marginBottom: '10px', textDecoration: 'none' }}>
+            <FiPackage size={17} /> My Orders
+          </Link>
+
+          {currentUser.isAdmin && (
+            <Link href="/admin" className="btn-outline"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '13px', marginBottom: '10px', textDecoration: 'none' }}>
+              Admin Dashboard
+            </Link>
+          )}
+
+          <button onClick={handleLogout} disabled={loggingOut}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '13px', borderRadius: '8px', border: 'none', backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: '600', cursor: 'pointer', fontSize: '14px', opacity: loggingOut ? 0.7 : 1 }}>
+            <FiLogOut size={17} /> {loggingOut ? 'Logging out...' : 'Logout'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
