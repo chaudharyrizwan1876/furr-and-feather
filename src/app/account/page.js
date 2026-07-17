@@ -3,7 +3,7 @@ import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
-import { FiPackage, FiLogOut } from 'react-icons/fi';
+import { FiLogOut } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 function AccountContent() {
@@ -15,7 +15,7 @@ function AccountContent() {
   const [error, setError] = useState('');
 
   // Session check — agar user pehle se logged-in hai to login form ki jagah
-  // "already logged in" wala view dikhayein
+  // sirf Logout wala view dikhayein (baaki details baad mein add hongi)
   const [checkingSession, setCheckingSession] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -133,7 +133,8 @@ function AccountContent() {
     );
   }
 
-  // Agar user pehle se logged-in hai — login form ki jagah yeh view dikhao
+  // Agar user pehle se logged-in hai — sirf Logout wala simple view
+  // (Naam/email/order jaisi details baad mein yahan add hongi)
   if (currentUser) {
     return (
       <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
@@ -142,19 +143,7 @@ function AccountContent() {
             {currentUser.name?.charAt(0).toUpperCase()}
           </div>
           <h2 style={{ fontSize: '1.3rem', fontWeight: '800', color: 'var(--text)', marginBottom: '4px' }}>Welcome, {currentUser.name}!</h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '24px' }}>{currentUser.email}</p>
-
-          <Link href="/account/orders" className="btn-primary"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '13px', marginBottom: '10px', textDecoration: 'none' }}>
-            <FiPackage size={17} /> My Orders
-          </Link>
-
-          {currentUser.isAdmin && (
-            <Link href="/admin" className="btn-outline"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '13px', marginBottom: '10px', textDecoration: 'none' }}>
-              Admin Dashboard
-            </Link>
-          )}
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '28px' }}>{currentUser.email}</p>
 
           <button onClick={handleLogout} disabled={loggingOut}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '13px', borderRadius: '8px', border: 'none', backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: '600', cursor: 'pointer', fontSize: '14px', opacity: loggingOut ? 0.7 : 1 }}>

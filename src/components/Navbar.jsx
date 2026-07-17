@@ -9,9 +9,18 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
    const totalItems = useCartStore((state) => state.totalItems);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    // Check karo ke user logged-in hai ya nahi, taake "My Orders" link
+    // sirf logged-in users ko dikhe
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => setIsLoggedIn(!!data.user))
+      .catch(() => setIsLoggedIn(false));
+  }, []);
 
   const navLinks = [
     { label: 'Home', href: '/' },
@@ -20,6 +29,8 @@ export default function Navbar() {
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
     { label: 'Track Order', href: '/track-order' },
+    // "My Orders" sirf logged-in users ko dikhta hai, Track Order ke bilkul baad
+    ...(isLoggedIn ? [{ label: 'My Orders', href: '/account/orders' }] : []),
   ];
 
   return (
