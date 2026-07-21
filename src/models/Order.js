@@ -2,15 +2,15 @@ import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema(
   {
-    // Agar order logged-in customer ne place kiya hai to uska User ID yahan save hota hai.
-    // Guest orders ke liye yeh field khali (null) rehta hai — unhe phone number se track kiya jata hai.
+    // If the order was placed by a logged-in customer, their User ID is saved here.
+    // For guest orders this field stays empty (null) — they're tracked by phone number instead.
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
 
     orderItems: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-        variantId: { type: mongoose.Schema.Types.ObjectId }, // agar product ka specific variant kharida gaya ho
-        variantLabel: { type: String }, // e.g. "4.5-10kg" — display ke liye
+        variantId: { type: mongoose.Schema.Types.ObjectId }, // set if a specific product variant was purchased
+        variantLabel: { type: String }, // e.g. "4.5-10kg" — for display
         name: { type: String, required: true },
         image: { type: String },
         price: { type: Number, required: true },

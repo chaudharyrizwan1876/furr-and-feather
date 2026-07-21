@@ -21,17 +21,17 @@ const productSchema = new mongoose.Schema(
     sku: { type: String },
     unit: { type: String },
     suitableFor: { type: String },
-    variants: [variantSchema], // Multiple weight/size variants ke liye
+    variants: [variantSchema], // For multiple weight/size variants
     isFeatured: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     rating: { type: Number, default: 0 },
     numReviews: { type: Number, default: 0 },
-    numSold: { type: Number, default: 0 }, // Kitni baar bik chuka hai - har order par automatically increment hota hai
+    numSold: { type: Number, default: 0 }, // Total units sold - automatically incremented on each order
 
-    // Manual ordering ke liye — Admin isay control karta hai up/down arrows se.
-    // Chhota number = pehle dikhega.
-    sortOrder: { type: Number, default: 0 },       // Shop page ka order
-    featuredOrder: { type: Number, default: 0 },   // Home page ke "Featured Products" ka order (alag rakha gaya hai taake Shop page ke order se conflict na ho)
+    // For manual ordering — controlled by the Admin via up/down arrows.
+    // Lower number = shown first.
+    sortOrder: { type: Number, default: 0 },       // Shop page display order
+    featuredOrder: { type: Number, default: 0 },   // Home page "Featured Products" order (kept separate so it doesn't conflict with the Shop page order)
 
     metaTitle: { type: String },
     metaDescription: { type: String },

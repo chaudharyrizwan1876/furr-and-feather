@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// Cart mein har item ko uniquely identify karne ke liye productId + variantId
-// dono use karte hain. Agar product ka koi variant nahi hai, variantId null
-// rehta hai. Yeh zaroori hai taake ek hi product ke 2 alag variants (jaise
-// Bravecto 4.5-10kg aur 40-56kg) alag-alag cart line items rahein, na ke
-// galti se merge ho jayein.
+// We use both productId + variantId to uniquely identify each item in the
+// cart. If a product has no variant, variantId stays null. This is
+// important so that 2 different variants of the same product (e.g.
+// Bravecto 4.5-10kg and 40-56kg) remain separate cart line items instead
+// of accidentally merging.
 const getItemKey = (productId, variantId) => `${productId}__${variantId || 'base'}`;
 
 const useCartStore = create(
@@ -13,8 +13,8 @@ const useCartStore = create(
     (set, get) => ({
       items: [],
 
-      // Cart mein product add karo. variantId/variantLabel optional hain —
-      // jab product ka koi specific variant select kiya gaya ho tab pass karo.
+      // Add a product to the cart. variantId/variantLabel are optional —
+      // pass them when a specific product variant has been selected.
       addItem: (product, quantity = 1, variant = null) => {
         const items = get().items;
         const variantId = variant?._id || null;
@@ -46,7 +46,7 @@ const useCartStore = create(
         set({ items: newItems, totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0) });
       },
 
-      // Quantity update karo — productId + variantId dono se match karo
+      // Update quantity — match on both productId + variantId
       updateQuantity: (productId, variantId, quantity) => {
         if (quantity < 1) return;
         const newItems = get().items.map((item) =>
@@ -57,7 +57,7 @@ const useCartStore = create(
         set({ items: newItems, totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0) });
       },
 
-      // Item remove karo — productId + variantId dono se match karo
+      // Remove an item — match on both productId + variantId
       removeItem: (productId, variantId) => {
         const newItems = get().items.filter(
           (item) => getItemKey(item.productId, item.variantId) !== getItemKey(productId, variantId)
@@ -65,16 +65,16 @@ const useCartStore = create(
         set({ items: newItems, totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0) });
       },
 
-      // Cart khali karo (order place hone ke baad)
+      // Clear the cart (after an order is placed)
       clearCart: () => set({ items: [], totalItems: 0 }),
 
-      // Total items count (Navbar badge ke liye)
+      // Total item count (for the Navbar badge)
       totalItems: 0,
       getTotalItems: () => {
         return get().items.reduce((sum, item) => sum + item.quantity, 0);
       },
 
-      // Subtotal calculate karo
+      // Calculate the subtotal
       getSubtotal: () => {
         return get().items.reduce((sum, item) => sum + item.price * item.quantity, 0);
       },

@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { verifySessionToken, COOKIE_NAME } from '@/lib/adminAuth';
 
-// Next.js 16 mein "middleware" file convention deprecated ho gayi hai,
-// ab "proxy" naam use hota hai — kaam same hai, bas naam badla hai.
+// The "middleware" file convention was deprecated in Next.js 16 —
+// it's now called "proxy" instead. Same behavior, just a different name.
 //
-// Ab admin protection unified /account login system se judi hai:
-// koi bhi user login kar sakta hai /account se, lekin /admin/* tabhi
-// khulega jab us user ka isAdmin: true ho (database mein set kiya gaya ho).
+// Admin protection is now tied to the unified /account login system:
+// any user can log in from /account, but /admin/* only opens if that
+// user's isAdmin is set to true (in the database).
 export async function proxy(request) {
   const { pathname } = request.nextUrl;
 
@@ -15,8 +15,8 @@ export async function proxy(request) {
     const session = await verifySessionToken(token);
 
     if (!session || !session.isAdmin) {
-      // Non-admin ya logged-out user ko account/login page par bhejo,
-      // aur batao ke wapas admin panel par aana chahta tha
+      // Redirect non-admin or logged-out users to the account/login page,
+      // and note that they were trying to reach the admin panel
       const loginUrl = new URL('/account', request.url);
       loginUrl.searchParams.set('redirect', '/admin');
       return NextResponse.redirect(loginUrl);

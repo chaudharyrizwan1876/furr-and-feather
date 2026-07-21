@@ -1,11 +1,10 @@
-// Session cookie ko sign/verify karne ke liye helper.
-// Web Crypto API (crypto.subtle) use karte hain — yeh Node.js aur Edge
-// dono runtimes mein kaam karta hai, isliye proxy.js (jo Node runtime
-// par chalta hai Next.js 16 mein) aur API routes dono ke liye ek hi
-// helper use ho sakta hai.
+// Helper for signing/verifying the session cookie.
+// Uses the Web Crypto API (crypto.subtle) — this works in both Node.js and
+// Edge runtimes, so the same helper can be used by proxy.js (which runs on
+// the Node runtime in Next.js 16) and the API routes.
 
 const COOKIE_NAME = 'ff_session';
-const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 7; // 7 din
+const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 
 function getSecret() {
   const secret = process.env.JWT_SECRET || 'fallback-secret-change-me';
@@ -24,8 +23,8 @@ async function hmacSign(data) {
   return Buffer.from(signature).toString('base64url');
 }
 
-// Session token banata hai — userId aur isAdmin dono encode karta hai,
-// taake login ke waqt hi pata chal jaye user ko kahan redirect karna hai
+// Creates a session token — encodes both userId and isAdmin, so at login time
+// it's already known where to redirect the user
 export async function createSessionToken({ userId, name, email, isAdmin }) {
   const payload = JSON.stringify({
     userId,
@@ -39,7 +38,7 @@ export async function createSessionToken({ userId, name, email, isAdmin }) {
   return `${encodedPayload}.${signature}`;
 }
 
-// Session token verify karta hai — signature aur expiry dono check karta hai
+// Verifies a session token — checks both the signature and the expiry
 export async function verifySessionToken(token) {
   if (!token || !token.includes('.')) return null;
 

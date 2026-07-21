@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('MONGODB_URI .env.local mein nahi mila');
+  throw new Error('MONGODB_URI not found in .env.local');
 }
 
-// Next.js mein connection cache karte hain taake har request par naya connection na bane
+// Cache the connection in Next.js so a new connection isn't created on every request
 let cached = global.mongoose;
 
 if (!cached) {
