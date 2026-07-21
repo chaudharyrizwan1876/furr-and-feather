@@ -1,15 +1,15 @@
-// Yeh script SIRF EK DAFA chalani hai. Yeh HAR product ke:
-// - PURANE reviews DELETE kar degi
-// - 5 NAYE reviews add karegi, sab 5-STAR
-// - Product ki rating = 5.0 aur numReviews = 5 set kar degi
+// This script only needs to run ONCE. For EVERY product, it will:
+// - DELETE existing reviews
+// - Add 5 NEW reviews, all 5-STAR
+// - Set the product's rating = 5.0 and numReviews = 5
 //
-// Chalane ka tareeqa (project ke root folder mein, jahan package.json hai):
+// How to run it (from the project root folder, where package.json is located):
 //
 //     node scripts/setAllFiveStars.mjs
 //
-// WARNING: Yeh purane reviews (jo pehle seed kiye thay, ya customer ne diye
-// thay) PERMANENTLY delete kar degi. Agar koi real customer review save
-// karna chahte hain to pehle unhe kahin note kar lein.
+// WARNING: This will PERMANENTLY delete existing reviews (whether they were
+// seeded earlier or submitted by real customers). If you want to keep any
+// real customer reviews, note them down somewhere first.
 
 import fs from 'fs';
 import path from 'path';
@@ -18,7 +18,7 @@ import mongoose from 'mongoose';
 function loadEnvLocal() {
   const envPath = path.resolve(process.cwd(), '.env.local');
   if (!fs.existsSync(envPath)) {
-    console.error('❌ .env.local file nahi mili. Yeh script project ke root folder se chalayein.');
+    console.error('❌ .env.local file not found. Run this script from the project root folder.');
     process.exit(1);
   }
   const content = fs.readFileSync(envPath, 'utf-8');
@@ -93,22 +93,22 @@ function buildComment(productName) {
 
 async function setAllFiveStars() {
   if (!process.env.MONGODB_URI) {
-    console.error('❌ MONGODB_URI .env.local mein nahi mila.');
+    console.error('❌ MONGODB_URI not found in .env.local.');
     process.exit(1);
   }
 
-  console.log('⏳ MongoDB se connect ho rahe hain...');
+  console.log('⏳ Connecting to MongoDB...');
   await mongoose.connect(process.env.MONGODB_URI);
   console.log('✅ MongoDB connected.\n');
 
   const products = await Product.find({});
-  console.log(`📦 ${products.length} products mile. Har product ko 5-star, 5 reviews set kar rahe hain...\n`);
+  console.log(`📦 Found ${products.length} products. Setting each to 5-star rating with 5 reviews...\n`);
 
   for (const product of products) {
-    // Purane reviews delete karo is product ke
+    // Delete existing reviews for this product
     await Review.deleteMany({ product: product._id });
 
-    // Naye naam pick karo, duplicate na hon
+    // Pick new names, avoiding duplicates
     const usedNames = new Set();
     const reviewsToCreate = [];
 
@@ -137,7 +137,7 @@ async function setAllFiveStars() {
     console.log(`✅ ${product.name} — 5⭐ rating, 5 reviews`);
   }
 
-  console.log(`\n🎉 Done! ${products.length} products ab 5-star rating aur 5 reviews ke sath hain.`);
+  console.log(`\n🎉 Done! ${products.length} products now have a 5-star rating with 5 reviews.`);
 
   await mongoose.disconnect();
   process.exit(0);

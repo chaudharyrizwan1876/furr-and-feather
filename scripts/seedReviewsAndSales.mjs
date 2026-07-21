@@ -1,14 +1,13 @@
-// Yeh script SIRF EK DAFA chalani hai, taake har product ke liye 3 reviews
-// (Roman Urdu mein) aur ek random "number of sold" value generate ho jaye.
+// This script only needs to run ONCE, to generate 3 reviews per product
+// (in Roman Urdu) along with a random "number of sold" value.
 //
-// Chalane ka tareeqa (project ke root folder mein, jahan package.json hai):
+// How to run it (from the project root folder, where package.json is located):
 //
 //     node scripts/seedReviewsAndSales.mjs
 //
-// NOTE: Yeh script un products ko SKIP kar deti hai jin ke pehle se reviews
-// maujood hain — taake dobara chalane se duplicate reviews na banein.
-// Agar aap baad mein naye products add karein, yeh script dobara chala
-// sakte hain — sirf nayi products ko reviews milenge.
+// NOTE: This script SKIPS products that already have reviews — so running
+// it again won't create duplicate reviews. If you add new products later,
+// you can run this script again — only the new products will get reviews.
 
 import fs from 'fs';
 import path from 'path';
@@ -17,7 +16,7 @@ import mongoose from 'mongoose';
 function loadEnvLocal() {
   const envPath = path.resolve(process.cwd(), '.env.local');
   if (!fs.existsSync(envPath)) {
-    console.error('❌ .env.local file nahi mili. Yeh script project ke root folder se chalayein.');
+    console.error('❌ .env.local file not found. Run this script from the project root folder.');
     process.exit(1);
   }
   const content = fs.readFileSync(envPath, 'utf-8');
@@ -34,7 +33,7 @@ function loadEnvLocal() {
 
 loadEnvLocal();
 
-// ===== Schemas (asal models se match karte hain) =====
+// ===== Schemas (match the actual models) =====
 const variantSchema = new mongoose.Schema({
   label: String,
   price: Number,
@@ -84,7 +83,7 @@ const reviewSchema = new mongoose.Schema(
 const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
 
-// ===== Roman Urdu reviewer names (Pakistani names ka mix) =====
+// ===== Reviewer names (mix of Pakistani names) =====
 const reviewerNames = [
   'Ahmed Raza', 'Sana Malik', 'Bilal Ahmed', 'Ayesha Khan', 'Usman Tariq',
   'Hina Shahid', 'Fahad Iqbal', 'Mariam Aslam', 'Hassan Butt', 'Zainab Riaz',
@@ -93,8 +92,8 @@ const reviewerNames = [
   'Tariq Mehmood', 'Saba Qureshi', 'Kashif Javed', 'Mehwish Saleem', 'Faisal Khalid',
 ];
 
-// ===== Roman Urdu review templates =====
-// {product} placeholder se product ka naam insert hoga
+// ===== Review templates (Roman Urdu — kept as-is, this is customer review content) =====
+// {product} placeholder gets replaced with the product's name
 const reviewTemplates = [
   'Bohat acha product hai, {product} bilkul genuine mila aur delivery bhi time par hui.',
   'Mera pet pehle bohat pareshan tha lekin {product} use karne ke baad farq saaf nazar aa raha hai. Highly recommended!',
@@ -126,16 +125,16 @@ function buildComment(productName) {
 
 async function seedReviewsAndSales() {
   if (!process.env.MONGODB_URI) {
-    console.error('❌ MONGODB_URI .env.local mein nahi mila.');
+    console.error('❌ MONGODB_URI not found in .env.local.');
     process.exit(1);
   }
 
-  console.log('⏳ MongoDB se connect ho rahe hain...');
+  console.log('⏳ Connecting to MongoDB...');
   await mongoose.connect(process.env.MONGODB_URI);
   console.log('✅ MongoDB connected.\n');
 
   const products = await Product.find({});
-  console.log(`📦 ${products.length} products mile.\n`);
+  console.log(`📦 Found ${products.length} products.\n`);
 
   let seededCount = 0;
   let skippedCount = 0;
@@ -148,8 +147,8 @@ async function seedReviewsAndSales() {
       continue;
     }
 
-    // 3 reviews banao har product ke liye
-    // Rating: zyada tar 4-5 ke beech, kuch products 5-star, kuch 4.x
+    // Create 3 reviews for each product
+    // Rating: mostly between 4-5, some products 5-star, some 4.x
     const usedNames = new Set();
     const reviewsToCreate = [];
 
@@ -160,7 +159,7 @@ async function seedReviewsAndSales() {
       }
       usedNames.add(name);
 
-      // Rating distribution: 50% 5-star, 35% 4-star, 15% 3-star (zyada tar positive)
+      // Rating distribution: 50% 5-star, 35% 4-star, 15% 3-star (mostly positive)
       const ratingRoll = Math.random();
       let rating;
       if (ratingRoll < 0.5) rating = 5;
@@ -172,18 +171,18 @@ async function seedReviewsAndSales() {
         customerName: name,
         rating,
         comment: buildComment(product.name),
-        isApproved: true, // seeded reviews directly approved hain
+        isApproved: true, // seeded reviews are approved immediately
       });
     }
 
     await Review.insertMany(reviewsToCreate);
 
-    // Product ka average rating aur numReviews update karo
+    // Update the product's average rating and numReviews
     const avgRating = reviewsToCreate.reduce((sum, r) => sum + r.rating, 0) / reviewsToCreate.length;
-    // Round to 1 decimal — kabhi 5.0, kabhi 4.7, 4.9 jaisi values aayengi naturally
+    // Round to 1 decimal — values like 5.0, 4.7, 4.9 will occur naturally
     const roundedRating = Math.round(avgRating * 10) / 10;
 
-    // numSold — 10 se 20 ke darmiyan random starting value
+    // numSold — random starting value between 10 and 20
     const initialNumSold = randInt(10, 20);
 
     product.rating = roundedRating;
@@ -195,7 +194,7 @@ async function seedReviewsAndSales() {
     seededCount++;
   }
 
-  console.log(`\n🎉 Done! ${seededCount} products ko reviews mile, ${skippedCount} products skip hue (already reviews thay).`);
+  console.log(`\n🎉 Done! ${seededCount} products received reviews, ${skippedCount} products were skipped (already had reviews).`);
 
   await mongoose.disconnect();
   process.exit(0);
