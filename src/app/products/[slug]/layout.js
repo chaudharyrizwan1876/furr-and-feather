@@ -13,7 +13,7 @@ export async function generateMetadata({ params }) {
     if (!product) {
       return {
         title: 'Product Not Found',
-        description: 'Yeh product available nahi hai.',
+        description: 'This product is not available.',
       };
     }
 
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }) {
   } catch (err) {
     return {
       title: "Furr & Feather's Hospital",
-      description: 'Pakistan ka trusted veterinary online store.',
+      description: "Pakistan's trusted veterinary online store.",
     };
   }
 }

@@ -17,7 +17,7 @@ function ProgressBar({ status }) {
   if (status === 'Cancelled') {
     return (
       <div style={{ backgroundColor: '#fee2e2', color: '#991b1b', padding: '14px', borderRadius: '10px', textAlign: 'center', fontWeight: '600', fontSize: '14px' }}>
-        ❌ Yeh order cancel ho gaya hai
+        ❌ This order has been cancelled
       </div>
     );
   }
@@ -84,7 +84,7 @@ export default function TrackOrderPage() {
   const [phone, setPhone] = useState('');
   const [singleOrder, setSingleOrder] = useState(null);
 
-  // Phone-only mode (saare orders)
+  // Phone-only mode (all orders)
   const [phoneOnly, setPhoneOnly] = useState('');
   const [phoneOrders, setPhoneOrders] = useState(null);
 
@@ -96,7 +96,7 @@ export default function TrackOrderPage() {
     setError('');
     setSingleOrder(null);
     if (!orderId.trim() || !phone.trim()) {
-      setError('Order ID aur phone number dono zaroori hain');
+      setError('Both Order ID and phone number are required');
       return;
     }
     setLoading(true);
@@ -104,12 +104,12 @@ export default function TrackOrderPage() {
       const res = await fetch(`/api/orders/track?orderId=${orderId.trim()}&phone=${phone.trim()}`);
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message || 'Order nahi mila');
+        setError(data.message || 'Order not found');
         return;
       }
       setSingleOrder(data);
     } catch (err) {
-      setError('Kuch ghalat ho gaya, dobara koshish karein');
+      setError('Something went wrong, please try again');
     } finally {
       setLoading(false);
     }
@@ -120,7 +120,7 @@ export default function TrackOrderPage() {
     setError('');
     setPhoneOrders(null);
     if (!phoneOnly.trim()) {
-      setError('Phone number zaroori hai');
+      setError('Phone number is required');
       return;
     }
     setLoading(true);
@@ -128,12 +128,12 @@ export default function TrackOrderPage() {
       const res = await fetch(`/api/orders/track-by-phone?phone=${phoneOnly.trim()}`);
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message || 'Koi order nahi mila');
+        setError(data.message || 'No orders found');
         return;
       }
       setPhoneOrders(data);
     } catch (err) {
-      setError('Kuch ghalat ho gaya, dobara koshish karein');
+      setError('Something went wrong, please try again');
     } finally {
       setLoading(false);
     }
@@ -145,18 +145,18 @@ export default function TrackOrderPage() {
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div style={{ fontSize: '48px', marginBottom: '10px' }}>📦</div>
           <h1 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text)', marginBottom: '6px' }}>Track Your Order</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Apne order ki current status check karein</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Check the current status of your order</p>
         </div>
 
         {/* Mode Tabs */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => { setMode('orderId'); setError(''); }}
             style={{ padding: '10px 20px', borderRadius: '20px', border: '2px solid', fontSize: '13px', fontWeight: '600', cursor: 'pointer', borderColor: mode === 'orderId' ? 'var(--primary)' : 'var(--border)', backgroundColor: mode === 'orderId' ? 'var(--primary)' : 'white', color: mode === 'orderId' ? 'white' : 'var(--text)' }}>
-            🔎 Order ID se Track Karein
+            🔎 Track by Order ID
           </button>
           <button onClick={() => { setMode('phone'); setError(''); }}
             style={{ padding: '10px 20px', borderRadius: '20px', border: '2px solid', fontSize: '13px', fontWeight: '600', cursor: 'pointer', borderColor: mode === 'phone' ? 'var(--primary)' : 'var(--border)', backgroundColor: mode === 'phone' ? 'var(--primary)' : 'white', color: mode === 'phone' ? 'white' : 'var(--text)' }}>
-            📱 Sirf Phone Number se (Meray Saare Orders)
+            📱 By Phone Number (All My Orders)
           </button>
         </div>
 
@@ -167,7 +167,7 @@ export default function TrackOrderPage() {
               <form onSubmit={handleTrackByOrderId} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
                   <label style={{ fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '6px' }}>Order ID</label>
-                  <input type="text" value={orderId} onChange={(e) => setOrderId(e.target.value)} placeholder="Order ID paste karein"
+                  <input type="text" value={orderId} onChange={(e) => setOrderId(e.target.value)} placeholder="Paste your Order ID"
                     style={{ width: '100%', padding: '11px 14px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '14px' }} />
                 </div>
                 <div>
@@ -187,12 +187,12 @@ export default function TrackOrderPage() {
           </>
         )}
 
-        {/* ===== MODE: Phone Only (saare orders) ===== */}
+        {/* ===== MODE: Phone Only (all orders) ===== */}
         {mode === 'phone' && (
           <>
             <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', marginBottom: '20px' }}>
               <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '14px' }}>
-                Order ID yaad nahi? Koi baat nahi — apna phone number daalein aur us number se kiye gaye SAARE orders ki list mil jayegi.
+                Don't remember your Order ID? No problem — just enter your phone number and you'll get a list of ALL orders placed with that number.
               </p>
               <form onSubmit={handleTrackByPhone} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 <input type="text" value={phoneOnly} onChange={(e) => setPhoneOnly(e.target.value)} placeholder="03xxxxxxxxx"
@@ -206,7 +206,7 @@ export default function TrackOrderPage() {
 
             {phoneOrders && (
               <div>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' }}>{phoneOrders.length} order(s) mile</p>
+                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' }}>{phoneOrders.length} order(s) found</p>
                 {phoneOrders.map((order) => <OrderCard key={order._id} order={order} />)}
               </div>
             )}
@@ -214,7 +214,7 @@ export default function TrackOrderPage() {
         )}
 
         <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', color: 'var(--text-muted)' }}>
-          Account hai? <Link href="/account/orders" style={{ color: 'var(--primary)', fontWeight: '600' }}>Login kar ke apni poori order history dekhein →</Link>
+          Have an account? <Link href="/account/orders" style={{ color: 'var(--primary)', fontWeight: '600' }}>Log in to view your full order history →</Link>
         </p>
       </div>
     </div>

@@ -44,7 +44,7 @@ export default function AdminCategoriesPage() {
       });
       setCounts(newCounts);
     } catch (err) {
-      console.error('Category counts fetch nahi hui', err);
+      console.error('Failed to fetch category counts', err);
     } finally {
       setLoading(false);
     }

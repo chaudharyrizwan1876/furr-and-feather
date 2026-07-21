@@ -1,6 +1,6 @@
 export const metadata = {
   title: "About Us — Furr & Feather's Hospital",
-  description: "Furr & Feather's Hospital ke baare mein janiye — Pakistan ka trusted veterinary online store. Rawalpindi mein located, poore Pakistan mein delivery.",
+  description: "Learn about Furr & Feather's Hospital — Pakistan's trusted veterinary online store. Based in Rawalpindi, delivering across all of Pakistan.",
 };
 
 export default function AboutLayout({ children }) {

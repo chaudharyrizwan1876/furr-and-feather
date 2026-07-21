@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Shop — Veterinary Medicines & Pet Care Products',
-  description: 'Pakistan ka largest online veterinary store. Dogs, cats aur birds ke liye genuine medicines, supplements aur pet food. Cash on Delivery available.',
+  description: "Pakistan's largest online veterinary store. Genuine medicines, supplements and pet food for dogs, cats and birds. Cash on Delivery available.",
 };
 
 export default function ShopLayout({ children }) {

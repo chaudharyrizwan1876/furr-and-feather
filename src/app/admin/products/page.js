@@ -11,7 +11,7 @@ export default function AdminProductsPage() {
   const [search, setSearch] = useState('');
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [orderMode, setOrderMode] = useState('shop'); // 'shop' | 'featured'
-  const [reordering, setReordering] = useState(null); // productId jo abhi move ho raha hai
+  const [reordering, setReordering] = useState(null); // productId currently being moved
 
   useEffect(() => {
     fetchProducts();
@@ -23,8 +23,8 @@ export default function AdminProductsPage() {
       const data = await res.json();
       setProducts(data);
     } catch (err) {
-      console.error('Products fetch nahi hui', err);
-      toast.error('Products load nahi hue');
+      console.error('Failed to fetch products', err);
+      toast.error('Products could not be loaded');
     } finally {
       setLoading(false);
     }
@@ -36,16 +36,16 @@ export default function AdminProductsPage() {
       const res = await fetch(`/api/products/${deleteTarget._id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('fail');
       setProducts((prev) => prev.filter((p) => p._id !== deleteTarget._id));
-      toast.success('Product delete ho gaya');
+      toast.success('Product deleted');
     } catch (err) {
-      toast.error('Delete nahi hua');
+      toast.error('Could not delete');
     } finally {
       setDeleteTarget(null);
     }
   };
 
-  // Order mode ke hisab se list nikalo — Shop order mein sab active products,
-  // Featured order mein sirf jo featured hain
+  // Build the list based on the order mode — in Shop order mode, all active products;
+  // in Featured order mode, only show products that are featured
   const orderField = orderMode === 'featured' ? 'featuredOrder' : 'sortOrder';
   const orderedList = products
     .filter((p) => p.isActive !== false)
@@ -61,9 +61,9 @@ export default function AdminProductsPage() {
         body: JSON.stringify({ productId: product._id, direction, field: orderField }),
       });
       if (!res.ok) throw new Error('fail');
-      await fetchProducts(); // Refresh karo taake naya order dikhe
+      await fetchProducts(); // Refresh so the new order is shown
     } catch (err) {
-      toast.error('Order update nahi hua');
+      toast.error('Order could not be updated');
     } finally {
       setReordering(null);
     }
@@ -71,7 +71,7 @@ export default function AdminProductsPage() {
 
   const filtered = search.trim()
     ? products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
-    : null; // Search hone par normal list dikhao, warna ordered list
+    : null; // Show the normal list while searching, otherwise the ordered list
 
   if (loading) {
     return <LoadingSpinner text="Loading products..." />;
@@ -112,8 +112,8 @@ export default function AdminProductsPage() {
 
       <div style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '12px 16px', marginBottom: '16px', fontSize: '13px', color: '#1e40af' }}>
         {orderMode === 'shop'
-          ? '↑↓ arrows se products ka order set karein — yehi order Shop page par dikhega.'
-          : '↑↓ arrows se Featured products ka order set karein — top wala product Home page par sab se pehle dikhega. (Sirf featured products yahan dikhte hain)'}
+          ? 'Use the ↑↓ arrows to set the product order — this is the order shown on the Shop page.'
+          : 'Use the ↑↓ arrows to set the order of Featured products — the top product will appear first on the Home page. (Only featured products are shown here)'}
       </div>
 
       <div style={{ position: 'relative', marginBottom: '16px', maxWidth: '320px' }}>
@@ -140,7 +140,7 @@ export default function AdminProductsPage() {
               {displayList.length === 0 ? (
                 <tr>
                   <td colSpan={showReorderControls ? 7 : 6} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                    {orderMode === 'featured' && !filtered ? 'Koi featured product nahi hai. Product edit kar ke "Featured" checkbox tick karein.' : 'No products found'}
+                    {orderMode === 'featured' && !filtered ? 'No featured products yet. Edit a product and check the "Featured" checkbox.' : 'No products found'}
                   </td>
                 </tr>
               ) : (
@@ -214,7 +214,7 @@ export default function AdminProductsPage() {
           <div style={{ backgroundColor: 'white', borderRadius: '14px', padding: '24px', maxWidth: '380px', width: '100%' }}>
             <h3 style={{ fontWeight: '700', fontSize: '17px', marginBottom: '10px' }}>Delete this product?</h3>
             <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '20px' }}>
-              <strong>{deleteTarget.name}</strong> permanently delete ho jayega.
+              <strong>{deleteTarget.name}</strong> will be permanently deleted.
             </p>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button onClick={() => setDeleteTarget(null)} className="btn-outline" style={{ flex: 1, padding: '10px' }}>Cancel</button>

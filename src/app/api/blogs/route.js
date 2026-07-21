@@ -2,8 +2,8 @@ import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 import { NextResponse } from 'next/server';
 
-// GET /api/blogs — Sab blogs fetch karo
-// ?published=true — sirf published blogs (customer-facing pages ke liye)
+// GET /api/blogs — Fetch all blogs
+// ?published=true — only published blogs (for customer-facing pages)
 export async function GET(request) {
   try {
     await connectDB();
@@ -19,7 +19,7 @@ export async function GET(request) {
   }
 }
 
-// Slug banane ka helper — title se URL-friendly slug generate karta hai
+// Slug generation helper — generates a URL-friendly slug from the title
 function generateSlug(title) {
   return title
     .toLowerCase()
@@ -29,19 +29,19 @@ function generateSlug(title) {
     .replace(/^-+|-+$/g, '');
 }
 
-// POST /api/blogs — Naya blog post banao
+// POST /api/blogs — Create a new blog post
 export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
 
     if (!body.title || !body.content) {
-      return NextResponse.json({ message: 'Title aur content zaroori hain' }, { status: 400 });
+      return NextResponse.json({ message: 'Title and content are required' }, { status: 400 });
     }
 
     let slug = body.slug?.trim() ? generateSlug(body.slug) : generateSlug(body.title);
 
-    // Slug unique hai ya nahi check karo, agar nahi to number add karo
+    // Check if the slug is unique, and append a number if it isn't
     let uniqueSlug = slug;
     let counter = 1;
     while (await Blog.findOne({ slug: uniqueSlug })) {

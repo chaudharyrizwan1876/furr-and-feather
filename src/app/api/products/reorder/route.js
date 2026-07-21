@@ -2,19 +2,19 @@ import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { NextResponse } from 'next/server';
 
-// POST /api/products/reorder — Do products ke beech order swap karo
+// POST /api/products/reorder — Swap the order between two products
 // Body: { productId: string, direction: 'up' | 'down', field: 'sortOrder' | 'featuredOrder', category?: string }
 //
-// 'field' batata hai kaunsa order control ho raha hai:
-//   'sortOrder'     — Shop page ka display order
-//   'featuredOrder' — Home page ke "Featured Products" section ka order (sirf featured products ke beech)
+// 'field' indicates which order is being controlled:
+//   'sortOrder'     — Shop page display order
+//   'featuredOrder' — Home page "Featured Products" section order (only among featured products)
 export async function POST(request) {
   try {
     await connectDB();
     const { productId, direction, field, category } = await request.json();
 
     if (!productId || !['up', 'down'].includes(direction) || !['sortOrder', 'featuredOrder'].includes(field)) {
-      return NextResponse.json({ message: 'productId, direction (up/down), aur field (sortOrder/featuredOrder) zaroori hain' }, { status: 400 });
+      return NextResponse.json({ message: 'productId, direction (up/down), and field (sortOrder/featuredOrder) are required' }, { status: 400 });
     }
 
     const filter = { isActive: true };
@@ -25,7 +25,7 @@ export async function POST(request) {
 
     const currentIndex = products.findIndex((p) => p._id.toString() === productId);
     if (currentIndex === -1) {
-      return NextResponse.json({ message: 'Product is list mein nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'Product not found in this list' }, { status: 404 });
     }
 
     const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
@@ -39,9 +39,9 @@ export async function POST(request) {
     const currentOrder = current[field];
     const swapOrder = swapWith[field];
 
-    // Agar dono ka order value same hai (jaise dono 0 hon, kyunki field abhi tak
-    // kisi ne set nahi kiya) to poori list ko pehle unique sequential values de dete hain,
-    // taake future swaps sahi tarah kaam karein
+    // If both order values are the same (e.g. both 0, because no one has set
+    // the field yet), assign unique sequential values to the whole list first,
+    // so future swaps work correctly
     if (currentOrder === swapOrder) {
       for (let i = 0; i < products.length; i++) {
         products[i][field] = i;
@@ -61,7 +61,7 @@ export async function POST(request) {
       await swapWith.save();
     }
 
-    return NextResponse.json({ message: 'Order update ho gaya' });
+    return NextResponse.json({ message: 'Order updated' });
   } catch (error) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }

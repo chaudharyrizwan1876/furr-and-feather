@@ -2,7 +2,7 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 import { NextResponse } from 'next/server';
 
-// GET /api/orders/:id — Single order fetch karo
+// GET /api/orders/:id — Fetch a single order
 export async function GET(request, { params }) {
   try {
     await connectDB();
@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
     const order = await Order.findById(id);
 
     if (!order) {
-      return NextResponse.json({ message: 'Order nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'Order not found' }, { status: 404 });
     }
 
     return NextResponse.json(order);
@@ -19,7 +19,7 @@ export async function GET(request, { params }) {
   }
 }
 
-// PUT /api/orders/:id — Order status update karo (Admin)
+// PUT /api/orders/:id — Update order status (Admin)
 export async function PUT(request, { params }) {
   try {
     await connectDB();
@@ -29,7 +29,7 @@ export async function PUT(request, { params }) {
     const order = await Order.findById(id);
 
     if (!order) {
-      return NextResponse.json({ message: 'Order nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'Order not found' }, { status: 404 });
     }
 
     order.orderStatus = body.orderStatus || order.orderStatus;

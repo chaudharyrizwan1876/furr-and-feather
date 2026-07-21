@@ -19,7 +19,7 @@ function ProgressBar({ status }) {
   if (status === 'Cancelled') {
     return (
       <div style={{ backgroundColor: '#fee2e2', color: '#991b1b', padding: '10px', borderRadius: '8px', textAlign: 'center', fontWeight: '600', fontSize: '13px' }}>
-        ❌ Yeh order cancel ho gaya hai
+        ❌ This order has been cancelled
       </div>
     );
   }
@@ -67,7 +67,7 @@ export default function MyOrdersPage() {
       const data = await res.json();
       setOrders(data);
     } catch (err) {
-      console.error('Orders fetch nahi hui', err);
+      console.error('Failed to fetch orders', err);
     } finally {
       setLoading(false);
     }
@@ -82,9 +82,9 @@ export default function MyOrdersPage() {
       <div style={{ backgroundColor: 'var(--bg)', minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
-          <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '8px' }}>Login karna zaroori hai</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>Apni order history dekhne ke liye pehle login karein.</p>
-          <Link href="/account?redirect=/account/orders" className="btn-primary" style={{ display: 'inline-block', padding: '10px 24px' }}>Login Karein</Link>
+          <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '8px' }}>Login Required</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>Please log in first to view your order history.</p>
+          <Link href="/account?redirect=/account/orders" className="btn-primary" style={{ display: 'inline-block', padding: '10px 24px' }}>Log In</Link>
         </div>
       </div>
     );
@@ -99,13 +99,13 @@ export default function MyOrdersPage() {
         </button>
 
         <h1 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text)', marginBottom: '4px' }}>My Orders</h1>
-        <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '20px' }}>Aapki poori order history — yahan hamesha maujood rahegi</p>
+        <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '20px' }}>Your complete order history — always available here</p>
 
         {orders.length === 0 ? (
           <div style={{ backgroundColor: 'white', borderRadius: '14px', padding: '50px 20px', textAlign: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
             <div style={{ fontSize: '48px', marginBottom: '12px' }}>📦</div>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>Abhi tak koi order nahi hai</p>
-            <Link href="/shop" className="btn-primary" style={{ display: 'inline-block', padding: '10px 24px' }}>Shopping Shuru Karein</Link>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>No orders yet</p>
+            <Link href="/shop" className="btn-primary" style={{ display: 'inline-block', padding: '10px 24px' }}>Start Shopping</Link>
           </div>
         ) : (
           orders.map((order) => (

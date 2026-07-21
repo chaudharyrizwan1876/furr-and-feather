@@ -4,7 +4,7 @@ import Order from '@/models/Order';
 import Review from '@/models/Review';
 import { NextResponse } from 'next/server';
 
-// GET /api/dashboard-stats — Admin dashboard overview ke liye real stats
+// GET /api/dashboard-stats — Real stats for the admin dashboard overview
 export async function GET(request) {
   try {
     await connectDB();
@@ -18,12 +18,13 @@ export async function GET(request) {
       Review.countDocuments({ isApproved: false }),
     ]);
 
-    // Total revenue — sab orders ke total ka sum (cancelled orders ko exclude karte hain)
+    // Total revenue — sum of all order totals (cancelled orders excluded)
     const totalRevenue = orders
       .filter((o) => o.orderStatus !== 'Cancelled')
       .reduce((sum, o) => sum + (o.total || 0), 0);
 
-    // Unique customers (phone number se, kyunki login system abhi functional nahi hai)
+    // Unique customers (by phone number, since orders can be linked to a phone
+    // whether placed as a guest or by a logged-in account)
     const uniquePhones = new Set(orders.map((o) => o.phone).filter(Boolean));
 
     // Recent 5 orders for the dashboard table

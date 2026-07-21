@@ -3,16 +3,16 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import './globals.css';
 
-const SITE_URL = 'https://furrandfeathers.com'; // ← Apna domain yahan likhein jab live karein
+const SITE_URL = 'https://furrandfeathers.com'; // ← Enter your domain here when going live
 const SITE_NAME = "Furr & Feather's Hospital";
 
 export const metadata = {
   // Basic
   title: {
     default: `${SITE_NAME} | Veterinary Medicines & Pet Care in Pakistan`,
-    template: `%s | ${SITE_NAME}`, // Pages apna title uss mein inject karenge
+    template: `%s | ${SITE_NAME}`, // Pages will inject their own title here
   },
-  description: 'Pakistan ka trusted veterinary online store. Dogs, cats aur birds ke liye genuine medicines, supplements, pet food aur accessories. Cash on Delivery Rawalpindi, Islamabad aur poore Pakistan mein.',
+  description: "Pakistan's trusted veterinary online store. Genuine medicines, supplements, pet food and accessories for dogs, cats and birds. Cash on Delivery across Rawalpindi, Islamabad and all of Pakistan.",
   keywords: [
     'veterinary medicines pakistan', 'pet medicines online', 'dog medicines pakistan',
     'cat medicines pakistan', 'bird medicines', 'bravecto pakistan', 'nexgard pakistan',
@@ -34,10 +34,10 @@ export const metadata = {
     url: SITE_URL,
     siteName: SITE_NAME,
     title: `${SITE_NAME} | Veterinary Medicines & Pet Care in Pakistan`,
-    description: 'Pakistan ka trusted veterinary online store. Genuine medicines, supplements & pet food. COD available.',
+    description: "Pakistan's trusted veterinary online store. Genuine medicines, supplements & pet food. COD available.",
     images: [
       {
-        url: '/og-image.png', // 1200x630px image — public folder mein rakhein (optional, nahi ho to bhi chalega)
+        url: '/og-image.png', // 1200x630px image — place it in the public folder (optional, works fine without it too)
         width: 1200,
         height: 630,
         alt: "Furr & Feather's Hospital — Pakistan's Trusted Pet Care Store",
@@ -65,7 +65,7 @@ export const metadata = {
     },
   },
 
-  // Verification (Google Search Console ke liye — baad mein add karein)
+  // Verification (for Google Search Console — add later)
   // verification: {
   //   google: 'YOUR_GOOGLE_VERIFICATION_CODE',
   // },

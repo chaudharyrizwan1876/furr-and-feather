@@ -14,8 +14,8 @@ export default function Navbar() {
 
   useEffect(() => {
     setMounted(true);
-    // Check karo ke user logged-in hai ya nahi, taake "My Orders" link
-    // sirf logged-in users ko dikhe
+    // Check whether the user is logged in, so the "My Orders" link
+    // can be shown to logged-in users only
     fetch('/api/auth/me')
       .then((res) => res.json())
       .then((data) => setIsLoggedIn(!!data.user))
@@ -29,7 +29,7 @@ export default function Navbar() {
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
     { label: 'Track Order', href: '/track-order' },
-    // "My Orders" sirf logged-in users ko dikhta hai, Track Order ke bilkul baad
+    // "My Orders" is shown only to logged-in users, right after Track Order
     ...(isLoggedIn ? [{ label: 'My Orders', href: '/account/orders' }] : []),
   ];
 

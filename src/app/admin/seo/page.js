@@ -34,8 +34,8 @@ export default function AdminSeoPage() {
       const data = await res.json();
       setBlogs(data);
     } catch (err) {
-      console.error('Blogs fetch nahi hui', err);
-      toast.error('Blogs load nahi hue');
+      console.error('Failed to fetch blogs', err);
+      toast.error('Blogs could not be loaded');
     } finally {
       setLoading(false);
     }
@@ -73,20 +73,20 @@ export default function AdminSeoPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title.trim() || !form.content.trim()) {
-      toast.error('Title aur content zaroori hain');
+      toast.error('Title and content are required');
       return;
     }
     setSaving(true);
     try {
       let imageUrl = imagePreview && !imageFile ? imagePreview : '';
 
-      // Agar nayi image select ki hai to upload karo
+      // If a new image was selected, upload it
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
         const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
         const uploadData = await uploadRes.json();
-        if (!uploadRes.ok) throw new Error(uploadData.message || 'Image upload nahi hui');
+        if (!uploadRes.ok) throw new Error(uploadData.message || 'Image upload failed');
         imageUrl = uploadData.url;
       }
 
@@ -101,20 +101,20 @@ export default function AdminSeoPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.message || 'Save nahi hua');
+        toast.error(data.message || 'Could not save');
         return;
       }
 
       if (editingId) {
         setBlogs((prev) => prev.map((b) => (b._id === editingId ? data : b)));
-        toast.success('Blog update ho gaya');
+        toast.success('Blog updated');
       } else {
         setBlogs((prev) => [data, ...prev]);
-        toast.success('Blog ban gaya');
+        toast.success('Blog created');
       }
       setShowForm(false);
     } catch (err) {
-      toast.error(err.message || 'Kuch ghalat ho gaya');
+      toast.error(err.message || 'Something went wrong');
     } finally {
       setSaving(false);
     }
@@ -129,9 +129,9 @@ export default function AdminSeoPage() {
       });
       if (!res.ok) throw new Error('fail');
       setBlogs((prev) => prev.map((b) => (b._id === blog._id ? { ...b, isPublished: !blog.isPublished } : b)));
-      toast.success(!blog.isPublished ? 'Blog publish ho gaya' : 'Blog unpublish ho gaya');
+      toast.success(!blog.isPublished ? 'Blog published' : 'Blog unpublished');
     } catch (err) {
-      toast.error('Kuch ghalat ho gaya');
+      toast.error('Something went wrong');
     }
   };
 
@@ -141,9 +141,9 @@ export default function AdminSeoPage() {
       const res = await fetch(`/api/blogs/${deleteTarget._id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('fail');
       setBlogs((prev) => prev.filter((b) => b._id !== deleteTarget._id));
-      toast.success('Blog delete ho gaya');
+      toast.success('Blog deleted');
     } catch (err) {
-      toast.error('Delete nahi hua');
+      toast.error('Could not delete');
     } finally {
       setDeleteTarget(null);
     }
@@ -156,7 +156,7 @@ export default function AdminSeoPage() {
   return (
     <div>
       <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text)', marginBottom: '4px' }}>SEO Manager</h1>
-      <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '20px' }}>Blog posts aur SEO settings yahan se manage karein</p>
+      <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '20px' }}>Manage blog posts and SEO settings from here</p>
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '2px solid var(--border)' }}>
@@ -187,7 +187,7 @@ export default function AdminSeoPage() {
 
           {blogs.length === 0 ? (
             <div style={{ backgroundColor: 'white', borderRadius: '14px', padding: '50px 20px', textAlign: 'center', color: 'var(--text-muted)', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
-              Koi blog post nahi hai. "New Blog Post" par click kar ke pehla post banayein.
+              No blog posts yet. Click "New Blog Post" to create your first one.
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -242,7 +242,7 @@ export default function AdminSeoPage() {
           <div style={{ backgroundColor: 'white', borderRadius: '14px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
             <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '12px' }}>🗺️ Sitemap & Robots</h3>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '14px', lineHeight: '1.6' }}>
-              Yeh dono files automatically generate hoti hain — sab products, blog posts, aur pages inme shamil hote hain. Google Search Console mein sitemap URL submit karein taake site jaldi index ho.
+              Both files are generated automatically — they include all products, blog posts, and pages. Submit the sitemap URL in Google Search Console to get the site indexed faster.
             </p>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="btn-outline" style={{ padding: '8px 16px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -257,14 +257,14 @@ export default function AdminSeoPage() {
           <div style={{ backgroundColor: 'white', borderRadius: '14px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
             <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '12px' }}>📦 Product SEO</h3>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
-              Har product apna khud ka meta title, meta description, aur focus keyword rakh sakta hai — yeh <strong>Products</strong> section mein product add/edit karte waqt set hota hai. Jo products yeh fields khali chhorte hain, unke liye product ka naam aur description automatically use ho jati hai.
+              Each product can have its own meta title, meta description, and focus keyword — set when adding or editing a product in the <strong>Products</strong> section. For products that leave these fields blank, the product's name and description are used automatically.
             </p>
           </div>
 
           <div style={{ backgroundColor: 'white', borderRadius: '14px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
             <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '12px' }}>⭐ Rich Results (Schema Markup)</h3>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
-              Har product page par automatically Product Schema (JSON-LD) add hota hai — jisse Google search results mein price, stock availability, aur star rating dikhai deti hai. Koi extra setup ki zaroorat nahi.
+              Product Schema (JSON-LD) is automatically added to every product page, so price, stock availability, and star rating appear in Google search results. No extra setup is required.
             </p>
           </div>
         </div>
@@ -289,7 +289,7 @@ export default function AdminSeoPage() {
 
               <div>
                 <label style={{ fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '6px' }}>
-                  URL Slug <span style={{ fontWeight: '400', color: 'var(--text-muted)' }}>(khali chhod dein to title se automatically ban jayega)</span>
+                  URL Slug <span style={{ fontWeight: '400', color: 'var(--text-muted)' }}>(leave empty to auto-generate from the title)</span>
                 </label>
                 <input type="text" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })}
                   placeholder="best-deworming-medicine-dogs"
@@ -334,14 +334,14 @@ export default function AdminSeoPage() {
               <div>
                 <label style={{ fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '6px' }}>Excerpt (short summary)</label>
                 <textarea value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} rows={2}
-                  placeholder="Chhota sa summary jo blog list mein dikhega"
+                  placeholder="A short summary shown in the blog list"
                   style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '14px', resize: 'vertical', fontFamily: 'inherit' }} />
               </div>
 
               <div>
                 <label style={{ fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '6px' }}>Content *</label>
                 <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} rows={8}
-                  placeholder="Poora blog content yahan likhein. Naye paragraph ke liye Enter dabayein."
+                  placeholder="Write the full blog content here. Press Enter to start a new paragraph."
                   style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '14px', resize: 'vertical', fontFamily: 'inherit' }} />
               </div>
 
@@ -351,13 +351,13 @@ export default function AdminSeoPage() {
                   <div>
                     <label style={{ fontSize: '12px', fontWeight: '600', display: 'block', marginBottom: '5px', color: 'var(--text-muted)' }}>Meta Title</label>
                     <input type="text" value={form.metaTitle} onChange={(e) => setForm({ ...form, metaTitle: e.target.value })}
-                      placeholder="Khali ho to blog title use hoga"
+                      placeholder="Leave empty to use the blog title"
                       style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '13px' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: '12px', fontWeight: '600', display: 'block', marginBottom: '5px', color: 'var(--text-muted)' }}>Meta Description</label>
                     <input type="text" value={form.metaDescription} onChange={(e) => setForm({ ...form, metaDescription: e.target.value })}
-                      placeholder="Khali ho to excerpt use hoga"
+                      placeholder="Leave empty to use the excerpt"
                       style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '13px' }} />
                   </div>
                   <div>
@@ -392,7 +392,7 @@ export default function AdminSeoPage() {
           <div style={{ backgroundColor: 'white', borderRadius: '14px', padding: '24px', maxWidth: '380px', width: '100%' }}>
             <h3 style={{ fontWeight: '700', fontSize: '17px', marginBottom: '10px' }}>Delete this blog post?</h3>
             <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '20px' }}>
-              <strong>{deleteTarget.title}</strong> permanently delete ho jayega. Yeh wapas nahi ho sakta.
+              <strong>{deleteTarget.title}</strong> will be permanently deleted. This cannot be undone.
             </p>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button onClick={() => setDeleteTarget(null)} className="btn-outline" style={{ flex: 1, padding: '10px' }}>Cancel</button>

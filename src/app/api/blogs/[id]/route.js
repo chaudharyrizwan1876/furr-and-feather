@@ -2,14 +2,14 @@ import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 import { NextResponse } from 'next/server';
 
-// GET /api/blogs/:id — Ek blog fetch karo (edit form ke liye)
+// GET /api/blogs/:id — Fetch a single blog (for the edit form)
 export async function GET(request, { params }) {
   try {
     await connectDB();
     const { id } = await params;
     const blog = await Blog.findById(id);
     if (!blog) {
-      return NextResponse.json({ message: 'Blog nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
     }
     return NextResponse.json(blog);
   } catch (error) {
@@ -17,7 +17,7 @@ export async function GET(request, { params }) {
   }
 }
 
-// PUT /api/blogs/:id — Blog update karo
+// PUT /api/blogs/:id — Update a blog
 export async function PUT(request, { params }) {
   try {
     await connectDB();
@@ -26,7 +26,7 @@ export async function PUT(request, { params }) {
 
     const blog = await Blog.findById(id);
     if (!blog) {
-      return NextResponse.json({ message: 'Blog nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
     }
 
     Object.keys(body).forEach((key) => {
@@ -40,16 +40,16 @@ export async function PUT(request, { params }) {
   }
 }
 
-// DELETE /api/blogs/:id — Blog delete karo
+// DELETE /api/blogs/:id — Delete a blog
 export async function DELETE(request, { params }) {
   try {
     await connectDB();
     const { id } = await params;
     const blog = await Blog.findByIdAndDelete(id);
     if (!blog) {
-      return NextResponse.json({ message: 'Blog nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
     }
-    return NextResponse.json({ message: 'Blog delete ho gaya' });
+    return NextResponse.json({ message: 'Blog deleted' });
   } catch (error) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }

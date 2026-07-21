@@ -77,8 +77,9 @@ function ShopContent() {
     }
   }, [selectedCategory, sortBy, ready]);
 
-  // Jab products load ho jayein, agar pehle se saved scroll position hai (product page se wapas aaye hain)
-  // to usi jagah par scroll karo, taake user ko har baar dobara scroll na karna pare
+  // Once products are loaded, if a scroll position was saved earlier (user
+  // navigated back from a product page), scroll to that position so the user
+  // doesn't have to scroll again every time
   useEffect(() => {
     if (!loading && products.length > 0) {
       const savedScroll = sessionStorage.getItem('shop-scroll-position');
@@ -91,12 +92,12 @@ function ShopContent() {
     }
   }, [loading, products]);
 
-  // Product card par click karne se pehle current scroll position save karo
+  // Save the current scroll position before a product card is clicked
   const handleProductClick = () => {
     sessionStorage.setItem('shop-scroll-position', String(window.scrollY));
   };
 
-  // Category change ko URL mein save karo, taake browser back button sahi category par wapas le jaye
+  // Save the category change to the URL, so the browser back button returns to the correct category
   const handleCategoryChange = (cat) => {
     const params = new URLSearchParams(searchParams.toString());
     if (cat === 'All') {
@@ -116,7 +117,7 @@ function ShopContent() {
       const data = await res.json();
       setProducts(data);
     } catch (err) {
-      console.error('Products fetch nahi hui', err);
+      console.error('Failed to fetch products', err);
     } finally {
       setLoading(false);
     }

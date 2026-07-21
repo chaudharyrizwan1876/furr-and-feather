@@ -17,7 +17,7 @@ export default function AdminCustomersPage() {
       const res = await fetch('/api/orders');
       const orders = await res.json();
 
-      // Login system abhi functional nahi hai, isliye customers ko phone number se group karte hain
+      // Orders can be placed as a guest, so customers are grouped by phone number
       const map = {};
       orders.forEach((order) => {
         const key = order.phone;
@@ -46,7 +46,7 @@ export default function AdminCustomersPage() {
       const list = Object.values(map).sort((a, b) => new Date(b.lastOrderDate) - new Date(a.lastOrderDate));
       setCustomers(list);
     } catch (err) {
-      console.error('Customers fetch nahi hui', err);
+      console.error('Failed to fetch customers', err);
     } finally {
       setLoading(false);
     }

@@ -19,13 +19,13 @@ export default function AdminInventoryPage() {
       const data = await res.json();
       setProducts(data);
     } catch (err) {
-      console.error('Inventory fetch nahi hui', err);
+      console.error('Failed to fetch inventory', err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Har product ka effective stock — agar variants hain to unka sum, warna base stock
+  // Each product's effective stock — sum of variant stock if variants exist, otherwise base stock
   const getEffectiveStock = (product) => {
     if (product.variants && product.variants.length > 0) {
       return product.variants.reduce((sum, v) => sum + (v.stock || 0), 0);

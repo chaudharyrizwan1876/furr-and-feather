@@ -30,8 +30,8 @@ export default function AdminReviewsPage() {
       const data = await res.json();
       setReviews(data);
     } catch (err) {
-      console.error('Reviews fetch nahi hui', err);
-      toast.error('Reviews load nahi hui');
+      console.error('Failed to fetch reviews', err);
+      toast.error('Reviews could not be loaded');
     } finally {
       setLoading(false);
     }
@@ -46,9 +46,9 @@ export default function AdminReviewsPage() {
       });
       if (!res.ok) throw new Error('Update fail');
       setReviews((prev) => prev.map((r) => (r._id === id ? { ...r, isApproved } : r)));
-      toast.success(isApproved ? 'Review approve ho gaya' : 'Review reject ho gaya');
+      toast.success(isApproved ? 'Review approved' : 'Review rejected');
     } catch (err) {
-      toast.error('Kuch ghalat ho gaya');
+      toast.error('Something went wrong');
     }
   };
 
@@ -58,9 +58,9 @@ export default function AdminReviewsPage() {
       const res = await fetch(`/api/reviews/${deleteTarget._id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Delete fail');
       setReviews((prev) => prev.filter((r) => r._id !== deleteTarget._id));
-      toast.success('Review delete ho gaya');
+      toast.success('Review deleted');
     } catch (err) {
-      toast.error('Delete nahi hua');
+      toast.error('Could not delete');
     } finally {
       setDeleteTarget(null);
     }

@@ -7,30 +7,30 @@ import { FaWhatsapp } from 'react-icons/fa';
 import useCartStore from '@/store/useCartStore';
 
 // =====================================================================
-// ADMIN KA WHATSAPP NUMBER — YAHAN APNA REAL NUMBER DAALO
-// Format: country code + number (koi spaces, dashes ya + nahi)
+// ADMIN'S WHATSAPP NUMBER — ENTER YOUR REAL NUMBER HERE
+// Format: country code + number (no spaces, dashes, or +)
 // Example: Pakistan 03001234567 → 923001234567
 // =====================================================================
-const ADMIN_WHATSAPP = '923295780676'; // ← APNA NUMBER YAHAN LIKHEIN
+const ADMIN_WHATSAPP = '923295780676'; // ← ENTER YOUR NUMBER HERE
 
 // =====================================================================
-// PAYMENT DETAILS — YAHAN APNI REAL VALUES BHARO
-// Sirf yeh ek jagah update karo, baaki sab automatically change ho jayega
+// PAYMENT DETAILS — ENTER YOUR REAL VALUES HERE
+// Update this one place only, everything else updates automatically
 // =====================================================================
 const paymentAccounts = {
   Easypaisa: {
-    number: '03427524477',        // ← APNA EASYPAISA NUMBER YAHAN LIKHO
-    title: 'Muhammad Rizwan',  // ← Account title (naam) — change karo agar different hai
+    number: '03427524477',        // ← ENTER YOUR EASYPAISA NUMBER HERE
+    title: 'Muhammad Rizwan',  // ← Account title (name) — change if different
   },
   JazzCash: {
-    number: '03295780676',        // ← APNA JAZZCASH NUMBER YAHAN LIKHO
-    title: 'Muhammad Rizwan',  // ← Account title (naam) — change karo agar different hai
+    number: '03295780676',        // ← ENTER YOUR JAZZCASH NUMBER HERE
+    title: 'Muhammad Rizwan',  // ← Account title (name) — change if different
   },
   BankTransfer: {
-    bank: 'JS Bank',          // ← APNA BANK NAAM YAHAN LIKHO (jaise "Meezan Bank", "HBL", "UBL")
-    accountNumber: '0002842674',  // ← APNA ACCOUNT NUMBER YAHAN LIKHO
-    iban: 'PK11JSBL9141000002842764', // ← APNA IBAN YAHAN LIKHO
-    title: 'Muhammad Rizwan',  // ← Account title (naam) — change karo agar different hai
+    bank: 'JS Bank',          // ← ENTER YOUR BANK NAME HERE (e.g. "Meezan Bank", "HBL", "UBL")
+    accountNumber: '0002842674',  // ← ENTER YOUR ACCOUNT NUMBER HERE
+    iban: 'PK11JSBL9141000002842764', // ← ENTER YOUR IBAN HERE
+    title: 'Muhammad Rizwan',  // ← Account title (name) — change if different
   },
 };
 
@@ -117,8 +117,8 @@ export default function CheckoutPage() {
 
     setLoading(true);
 
-    // Check karo ke user logged-in hai ya nahi, agar hai to uska ID le lo
-    // taake order account se link ho jaye (My Orders mein dikhe)
+    // Check whether the user is logged in, and if so, get their ID
+    // so the order can be linked to their account (shown in My Orders)
     let loggedInUserId = null;
     try {
       const sessionRes = await fetch('/api/auth/me');
@@ -127,7 +127,7 @@ export default function CheckoutPage() {
         loggedInUserId = sessionData.user.userId || null;
       }
     } catch (err) {
-      // Session check fail ho to guest ki tarah proceed karo, koi masla nahi
+      // If the session check fails, proceed as a guest — no issue
     }
 
     try {
@@ -187,13 +187,13 @@ export default function CheckoutPage() {
   };
 
   if (orderPlaced) {
-    // Pre-filled WhatsApp message — order details already typed hoge jab admin ko message jaye
+    // Pre-filled WhatsApp message — order details are already typed in when the message reaches the admin
     const waMessage = encodeURIComponent(
-      `Assalam o Alaikum! Mera order place ho gaya hai.\n\n` +
+      `Hello! I have just placed an order.\n\n` +
       `Order ID: ${orderPlaced._id}\n` +
-      `Naam: ${orderPlaced.customerName}\n` +
+      `Name: ${orderPlaced.customerName}\n` +
       `Phone: ${orderPlaced.phone}\n\n` +
-      `Shukriya!`
+      `Thank you!`
     );
     const waLink = `https://wa.me/${ADMIN_WHATSAPP}?text=${waMessage}`;
 
@@ -201,8 +201,8 @@ export default function CheckoutPage() {
       <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div style={{ backgroundColor: 'white', borderRadius: '20px', padding: '40px 28px', textAlign: 'center', maxWidth: '480px', width: '100%', boxShadow: '0 4px 24px rgba(0,0,0,0.1)' }}>
           <div style={{ width: '70px', height: '70px', backgroundColor: '#f0fdf4', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: '32px' }}>✅</div>
-          <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '12px' }}>Shukriya!</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '8px', fontSize: '14px' }}>Aapka order successfully place ho gaya hai.</p>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '12px' }}>Thank You!</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '8px', fontSize: '14px' }}>Your order has been placed successfully.</p>
 
           <div style={{ backgroundColor: 'var(--bg)', borderRadius: '10px', padding: '14px', margin: '18px 0' }}>
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Order Number</p>
@@ -211,15 +211,15 @@ export default function CheckoutPage() {
 
           {/* WhatsApp Confirmation Button */}
           <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
-            <p style={{ fontSize: '13px', color: '#166534', fontWeight: '600', marginBottom: '4px' }}>📱 Order Confirm Karein</p>
-            <p style={{ fontSize: '12px', color: '#166534', marginBottom: '12px', opacity: 0.8 }}>Behtareen experience ke liye WhatsApp par apna order confirm karein — message already ready hoga, sirf send karna hoga</p>
+            <p style={{ fontSize: '13px', color: '#166534', fontWeight: '600', marginBottom: '4px' }}>📱 Confirm Your Order</p>
+            <p style={{ fontSize: '12px', color: '#166534', marginBottom: '12px', opacity: 0.8 }}>For the best experience, confirm your order on WhatsApp — the message will already be ready, just tap send</p>
             <a href={waLink} target="_blank" rel="noopener noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: '#25D366', color: 'white', padding: '12px 24px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '15px' }}>
-              <FaWhatsapp size={20} /> WhatsApp par Confirm Karein
+              <FaWhatsapp size={20} /> Confirm on WhatsApp
             </a>
           </div>
 
-          <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginBottom: '24px' }}>Hum jald hi aapse rabta karenge order confirm karne ke liye.</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginBottom: '24px' }}>We will contact you shortly to confirm your order.</p>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/track-order" className="btn-primary">Track Order</Link>
             <Link href="/shop" className="btn-outline">Continue Shopping</Link>

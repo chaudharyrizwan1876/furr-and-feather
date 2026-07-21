@@ -56,17 +56,17 @@ export default function ProductDetailPage({ params }) {
         setSelectedVariant(data.variants[0]);
       }
 
-      // Related products — same category se fetch karo
+      // Fetch related products from the same category
       const relatedRes = await fetch(`/api/products?category=${encodeURIComponent(data.category)}`);
       const relatedData = await relatedRes.json();
       setRelatedProducts(relatedData.filter(p => p._id !== data._id).slice(0, 4));
 
-      // Is product ke approved reviews fetch karo
+      // Fetch this product's approved reviews
       const reviewsRes = await fetch(`/api/reviews?product=${data._id}&approved=true`);
       const reviewsData = await reviewsRes.json();
       setReviews(reviewsData);
     } catch (err) {
-      console.error('Product fetch nahi hua', err);
+      console.error('Failed to fetch product', err);
     } finally {
       setLoading(false);
     }
@@ -84,16 +84,16 @@ export default function ProductDetailPage({ params }) {
     return (
       <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', textAlign: 'center' }}>
         <div style={{ fontSize: '56px', marginBottom: '16px' }}>📦</div>
-        <h2 style={{ color: 'var(--text)', marginBottom: '8px' }}>Product nahi mila</h2>
-        <Link href="/shop" className="btn-primary" style={{ marginTop: '16px' }}>Shop Par Wapas Jao</Link>
+        <h2 style={{ color: 'var(--text)', marginBottom: '8px' }}>Product Not Found</h2>
+        <Link href="/shop" className="btn-primary" style={{ marginTop: '16px' }}>Back to Shop</Link>
       </div>
     );
   }
 
   const images = product.images && product.images.length > 0 ? product.images : null;
 
-  // Yeh sab product ke available hone ke BAAD define hote hain
-  // (upar product null tha to crash hota tha — yeh wahi bug fix hy)
+  // These are all defined AFTER the product is confirmed to exist
+  // (earlier the product was null, causing a crash — this is that same bug fix)
   const hasDiscount = product.discountPrice > 0 && product.discountPrice < product.price;
   const getActivePrice = () => {
     if (selectedVariant) return selectedVariant.price;
@@ -101,9 +101,9 @@ export default function ProductDetailPage({ params }) {
   };
   const getActiveStock = () => selectedVariant ? selectedVariant.stock : product.stock;
 
-  // Google Rich Results ke liye JSON-LD Product Schema
-  // NOTE: yeh hasDiscount/getActiveStock ke BAAD hona zaroori hai, warna
-  // "Cannot access before initialization" error aata hai
+  // JSON-LD Product Schema for Google Rich Results
+  // NOTE: this must come after hasDiscount/getActiveStock, otherwise a
+  // "Cannot access before initialization" error occurs
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -147,9 +147,9 @@ export default function ProductDetailPage({ params }) {
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     setReviewError('');
-    if (!reviewForm.name.trim()) { setReviewError('Apna naam likhein'); return; }
-    if (reviewForm.rating === 0) { setReviewError('Rating zaroor select karein'); return; }
-    if (!reviewForm.comment.trim()) { setReviewError('Review likhein'); return; }
+    if (!reviewForm.name.trim()) { setReviewError('Please enter your name'); return; }
+    if (reviewForm.rating === 0) { setReviewError('Please select a rating'); return; }
+    if (!reviewForm.comment.trim()) { setReviewError('Please write a review'); return; }
 
     setReviewSubmitting(true);
     try {
@@ -165,13 +165,13 @@ export default function ProductDetailPage({ params }) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setReviewError(data.message || 'Review submit nahi hua');
+        setReviewError(data.message || 'Review could not be submitted');
         return;
       }
       setReviewSubmitted(true);
       setReviewForm({ name: '', rating: 0, comment: '' });
     } catch (err) {
-      setReviewError('Kuch ghalat ho gaya, dobara koshish karein');
+      setReviewError('Something went wrong, please try again');
     } finally {
       setReviewSubmitting(false);
     }
@@ -370,7 +370,7 @@ export default function ProductDetailPage({ params }) {
               {reviews.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-muted)' }}>
                   <div style={{ fontSize: '48px', marginBottom: '12px' }}>⭐</div>
-                  <p>Abhi koi review nahi hai — pehle review likhne wale banein!</p>
+                  <p>No reviews yet — be the first to write one!</p>
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
@@ -389,17 +389,17 @@ export default function ProductDetailPage({ params }) {
               {/* Review Submit Form */}
               <div style={{ borderTop: reviews.length > 0 ? '2px solid var(--border)' : 'none', paddingTop: reviews.length > 0 ? '24px' : '0' }}>
                 <h4 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text)', marginBottom: '16px' }}>
-                  ✍️ Apna Review Likhen
+                  ✍️ Write Your Review
                 </h4>
 
                 {reviewSubmitted ? (
                   <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '18px', textAlign: 'center' }}>
                     <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎉</div>
-                    <p style={{ fontWeight: '700', color: '#166534', marginBottom: '4px' }}>Shukriya aapke review ke liye!</p>
-                    <p style={{ fontSize: '13px', color: '#166534' }}>Aapka review admin approval ke baad is product par dikhai dega.</p>
+                    <p style={{ fontWeight: '700', color: '#166534', marginBottom: '4px' }}>Thank you for your review!</p>
+                    <p style={{ fontSize: '13px', color: '#166534' }}>Your review will appear on this product once approved by an admin.</p>
                     <button onClick={() => setReviewSubmitted(false)}
                       style={{ marginTop: '12px', fontSize: '12px', color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
-                      Aur ek review likhein
+                      Write another review
                     </button>
                   </div>
                 ) : (
@@ -413,11 +413,11 @@ export default function ProductDetailPage({ params }) {
                     {/* Name field */}
                     <div>
                       <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px', color: 'var(--text)' }}>
-                        Aapka Naam *
+                        Your Name *
                       </label>
                       <input type="text" value={reviewForm.name}
                         onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })}
-                        placeholder="Apna naam likhein"
+                        placeholder="Enter your name"
                         style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '14px' }} />
                     </div>
 
@@ -440,7 +440,7 @@ export default function ProductDetailPage({ params }) {
                         ))}
                         {reviewForm.rating > 0 && (
                           <span style={{ alignSelf: 'center', fontSize: '13px', color: 'var(--text-muted)', marginLeft: '6px' }}>
-                            {['', 'Bohat Bura', 'Bura', 'Theek Hai', 'Acha', 'Bohat Acha'][reviewForm.rating]}
+                            {['', 'Very Poor', 'Poor', 'Okay', 'Good', 'Excellent'][reviewForm.rating]}
                           </span>
                         )}
                       </div>
@@ -449,18 +449,18 @@ export default function ProductDetailPage({ params }) {
                     {/* Comment */}
                     <div>
                       <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px', color: 'var(--text)' }}>
-                        Aapka Review *
+                        Your Review *
                       </label>
                       <textarea value={reviewForm.comment}
                         onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
-                        placeholder="Is product ke baare mein apna experience share karein..."
+                        placeholder="Share your experience with this product..."
                         rows={4}
                         style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '14px', resize: 'vertical', fontFamily: 'inherit' }} />
                     </div>
 
                     <button type="submit" disabled={reviewSubmitting} className="btn-primary"
                       style={{ alignSelf: 'flex-start', padding: '10px 24px', opacity: reviewSubmitting ? 0.7 : 1 }}>
-                      {reviewSubmitting ? 'Submit ho raha hai...' : 'Review Submit Karein'}
+                      {reviewSubmitting ? 'Submitting...' : 'Submit Review'}
                     </button>
                   </form>
                 )}

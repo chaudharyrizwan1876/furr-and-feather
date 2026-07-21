@@ -3,7 +3,7 @@ import Order from '@/models/Order';
 import Product from '@/models/Product';
 import { NextResponse } from 'next/server';
 
-// GET /api/orders — Sab orders fetch karo (admin ke liye)
+// GET /api/orders — Fetch all orders (for admin)
 export async function GET(request) {
   try {
     await connectDB();
@@ -14,13 +14,13 @@ export async function GET(request) {
   }
 }
 
-// POST /api/orders — Naya order place karo
+// POST /api/orders — Place a new order
 export async function POST(request) {
   try {
     await connectDB();
     const body = await request.json();
     const {
-      user, // logged-in ho to userId, warna null/undefined (guest)
+      user, // userId if logged in, otherwise null/undefined (guest)
       orderItems,
       customerName,
       phone,
@@ -36,36 +36,36 @@ export async function POST(request) {
     } = body;
 
     if (!customerName || !phone || !address || !city) {
-      return NextResponse.json({ message: 'Sab zaroori fields bharein' }, { status: 400 });
+      return NextResponse.json({ message: 'Please fill in all required fields' }, { status: 400 });
     }
 
     if (!orderItems || orderItems.length === 0) {
-      return NextResponse.json({ message: 'Cart khali hai' }, { status: 400 });
+      return NextResponse.json({ message: 'Your cart is empty' }, { status: 400 });
     }
 
-    // Stock check karo (variant-specific ya base product, jo bhi applicable ho)
+    // Check stock (variant-specific or base product, whichever applies)
     for (const item of orderItems) {
       const product = await Product.findById(item.product);
       if (!product) {
-        return NextResponse.json({ message: `Product nahi mila: ${item.name}` }, { status: 404 });
+        return NextResponse.json({ message: `Product not found: ${item.name}` }, { status: 404 });
       }
 
       if (item.variantId) {
         const variant = product.variants.find((v) => v._id.toString() === item.variantId.toString());
         if (!variant) {
-          return NextResponse.json({ message: `Variant nahi mila: ${item.name}` }, { status: 404 });
+          return NextResponse.json({ message: `Variant not found: ${item.name}` }, { status: 404 });
         }
         if (variant.stock < item.quantity) {
-          return NextResponse.json({ message: `${item.name} ka stock kam hai. Sirf ${variant.stock} available hai.` }, { status: 400 });
+          return NextResponse.json({ message: `${item.name} is low on stock. Only ${variant.stock} available.` }, { status: 400 });
         }
       } else {
         if (product.stock < item.quantity) {
-          return NextResponse.json({ message: `${item.name} ka stock kam hai. Sirf ${product.stock} available hai.` }, { status: 400 });
+          return NextResponse.json({ message: `${item.name} is low on stock. Only ${product.stock} available.` }, { status: 400 });
         }
       }
     }
 
-    // Sab theek hai to stock kam karo aur numSold barhao (variant-specific ya base product)
+    // Everything checks out — reduce stock and increase numSold (variant-specific or base product)
     for (const item of orderItems) {
       if (item.variantId) {
         const product = await Product.findById(item.product);

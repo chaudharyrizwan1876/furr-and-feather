@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { verifySessionToken, COOKIE_NAME } from '@/lib/adminAuth';
 import { NextResponse } from 'next/server';
 
-// GET /api/auth/me — Currently logged-in user ki info (session cookie se)
+// GET /api/auth/me — Info about the currently logged-in user (from the session cookie)
 export async function GET(request) {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;

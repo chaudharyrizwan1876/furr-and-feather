@@ -20,7 +20,7 @@ export default function BlogPage() {
       const data = await res.json();
       setBlogs(data);
     } catch (err) {
-      console.error('Blogs fetch nahi hui', err);
+      console.error('Failed to fetch blogs', err);
     } finally {
       setLoading(false);
     }
@@ -54,8 +54,8 @@ export default function BlogPage() {
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'white', borderRadius: '14px', color: 'var(--text-muted)' }}>
             <div style={{ fontSize: '56px', marginBottom: '16px' }}>📝</div>
-            <h3 style={{ marginBottom: '8px', color: 'var(--text)' }}>Koi article nahi mila</h3>
-            <p>Jald hi naye articles publish honge!</p>
+            <h3 style={{ marginBottom: '8px', color: 'var(--text)' }}>No articles found</h3>
+            <p>New articles will be published soon!</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>

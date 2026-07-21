@@ -3,9 +3,9 @@ import Order from '@/models/Order';
 import { NextResponse } from 'next/server';
 
 // GET /api/orders/track-by-phone?phone=03xxxxxxxxx
-// Guest customers ke liye — sirf phone number se unke SAARE orders mil jate hain,
-// Order ID yaad rakhne ki zaroorat nahi. Yeh delivered orders ke baad bhi kaam
-// karta rehta hai, taake customer apni poori order history dekh sake.
+// For guest customers — just the phone number is enough to find ALL of their
+// orders, no need to remember an Order ID. This keeps working even after
+// delivery, so a customer can view their full order history.
 export async function GET(request) {
   try {
     await connectDB();
@@ -13,11 +13,11 @@ export async function GET(request) {
     const phone = searchParams.get('phone');
 
     if (!phone || !phone.trim()) {
-      return NextResponse.json({ message: 'Phone number zaroori hai' }, { status: 400 });
+      return NextResponse.json({ message: 'Phone number is required' }, { status: 400 });
     }
 
-    // Phone number ko normalize karte hain (spaces/dashes hata kar) taake
-    // "0342-7524477" aur "03427524477" dono match ho jayein
+    // Normalize the phone number (strip spaces/dashes) so that
+    // "0342-7524477" and "03427524477" both match
     const normalizedPhone = phone.replace(/[\s-]/g, '');
 
     const allOrders = await Order.find({}).select(
@@ -29,7 +29,7 @@ export async function GET(request) {
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     if (matchedOrders.length === 0) {
-      return NextResponse.json({ message: 'Is phone number se koi order nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'No orders found for this phone number' }, { status: 404 });
     }
 
     return NextResponse.json(matchedOrders);

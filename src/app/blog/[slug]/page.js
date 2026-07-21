@@ -34,7 +34,7 @@ export default function BlogDetailPage({ params }) {
       const related = allBlogs.filter((p) => p.category === found.category && p.slug !== found.slug).slice(0, 2);
       setRelatedPosts(related);
     } catch (err) {
-      console.error('Blog fetch nahi hua', err);
+      console.error('Failed to fetch blog', err);
       setNotFound(true);
     } finally {
       setLoading(false);
@@ -51,14 +51,14 @@ export default function BlogDetailPage({ params }) {
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '56px', marginBottom: '16px' }}>📄</div>
           <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '8px' }}>Blog post not found</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>Yeh article maujood nahi hai ya hata diya gaya hai.</p>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>This article doesn't exist or has been removed.</p>
           <Link href="/blog" className="btn-primary" style={{ display: 'inline-block', padding: '10px 24px' }}>Back to Blog</Link>
         </div>
       </div>
     );
   }
 
-  // Content ko paragraphs mein split karte hain (agar admin ne blank line se paragraphs alag kiye hon)
+  // Split the content into paragraphs (if the admin separated paragraphs with a blank line)
   const paragraphs = post.content.split('\n').filter((p) => p.trim());
 
   return (

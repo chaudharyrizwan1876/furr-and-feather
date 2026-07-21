@@ -4,7 +4,7 @@ import Order from '@/models/Order';
 import { verifySessionToken, COOKIE_NAME } from '@/lib/adminAuth';
 import { NextResponse } from 'next/server';
 
-// GET /api/orders/my — Logged-in user ke saare orders (session cookie se pehchana jata hai)
+// GET /api/orders/my — All orders for the logged-in user (identified via the session cookie)
 export async function GET(request) {
   try {
     const cookieStore = await cookies();
@@ -12,7 +12,7 @@ export async function GET(request) {
     const session = await verifySessionToken(token);
 
     if (!session || !session.userId) {
-      return NextResponse.json({ message: 'Login zaroori hai' }, { status: 401 });
+      return NextResponse.json({ message: 'Login is required' }, { status: 401 });
     }
 
     await connectDB();

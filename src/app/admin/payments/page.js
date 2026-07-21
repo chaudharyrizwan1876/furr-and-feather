@@ -27,8 +27,8 @@ export default function AdminPaymentsPage() {
       const data = await res.json();
       setOrders(data);
     } catch (err) {
-      console.error('Orders fetch nahi hui', err);
-      toast.error('Payments load nahi hue');
+      console.error('Failed to fetch orders', err);
+      toast.error('Payments could not be loaded');
     } finally {
       setLoading(false);
     }
@@ -44,9 +44,9 @@ export default function AdminPaymentsPage() {
       });
       if (!res.ok) throw new Error('fail');
       setOrders((prev) => prev.map((o) => (o._id === orderId ? { ...o, paymentStatus } : o)));
-      toast.success(paymentStatus === 'Verified' ? 'Payment verify ho gaya' : 'Payment reject ho gaya');
+      toast.success(paymentStatus === 'Verified' ? 'Payment verified' : 'Payment rejected');
     } catch (err) {
-      toast.error('Kuch ghalat ho gaya');
+      toast.error('Something went wrong');
     } finally {
       setUpdatingId(null);
     }

@@ -127,17 +127,17 @@ export default function HomePage() {
       setCategoryImages(images);
       setCategoryCounts(counts);
 
-      // Featured products — ab featuredOrder ke hisab se sorted hain.
-      // Admin panel (Products > Featured Products Order tab) se jo order
-      // set kiya jata hai, wahi order yahan follow hota hai.
-      // Chhota featuredOrder number = pehle dikhega.
+      // Featured products — now sorted by featuredOrder.
+      // Whatever order is set in the admin panel (Products > Featured Products
+      // Order tab) is followed here.
+      // A lower featuredOrder number is shown first.
       const featured = allProducts
         .filter((p) => p.isFeatured)
         .sort((a, b) => (a.featuredOrder || 0) - (b.featuredOrder || 0) || a._id.localeCompare(b._id));
       setFeaturedProducts(featured);
 
-      // Home page testimonials — real approved reviews se, latest pehle.
-      // Pehle 5-star products ke reviews dikhao, phir baqi se fill karo (max 4)
+      // Home page testimonials — sourced from real approved reviews, latest first.
+      // Show reviews from 5-star products first, then fill the rest (max 4)
       const reviewsRes = await fetch('/api/reviews?approved=true');
       const allReviews = await reviewsRes.json();
 
@@ -146,7 +146,7 @@ export default function HomePage() {
       const combined = [...fiveStarReviews, ...otherReviews].slice(0, 4);
       setTestimonials(combined);
     } catch (err) {
-      console.error('Home data fetch nahi hui', err);
+      console.error('Failed to fetch home page data', err);
     } finally {
       setLoading(false);
     }

@@ -3,21 +3,21 @@ import User from '@/models/User';
 import { createSessionToken, COOKIE_NAME } from '@/lib/adminAuth';
 import { NextResponse } from 'next/server';
 
-// POST /api/auth/register — Naya customer account banao
-// IMPORTANT: Register se bana hua account hamesha customer hota hai (isAdmin: false).
-// Admin account is route se kabhi nahi ban sakta — woh sirf seed script se banta hai.
+// POST /api/auth/register — Create a new customer account
+// IMPORTANT: accounts created via Register are always customers (isAdmin: false).
+// An admin account can never be created through this route — only via the seed script.
 export async function POST(request) {
   try {
     await connectDB();
     const { name, email, phone, password } = await request.json();
 
     if (!name || !email || !password) {
-      return NextResponse.json({ message: 'Naam, email aur password zaroori hain' }, { status: 400 });
+      return NextResponse.json({ message: 'Name, email and password are required' }, { status: 400 });
     }
 
     const existing = await User.findOne({ email: email.toLowerCase().trim() });
     if (existing) {
-      return NextResponse.json({ message: 'Is email se account already bana hua hai' }, { status: 400 });
+      return NextResponse.json({ message: 'An account with this email already exists' }, { status: 400 });
     }
 
     const user = await User.create({
@@ -25,7 +25,7 @@ export async function POST(request) {
       email: email.toLowerCase().trim(),
       phone: phone?.trim(),
       password,
-      isAdmin: false, // hardcoded — register se kabhi admin nahi banta
+      isAdmin: false, // hardcoded — registration never creates an admin
     });
 
     const token = await createSessionToken({
@@ -36,7 +36,7 @@ export async function POST(request) {
     });
 
     const response = NextResponse.json({
-      message: 'Account ban gaya',
+      message: 'Account created',
       user: { name: user.name, email: user.email, isAdmin: user.isAdmin },
     });
     response.cookies.set(COOKIE_NAME, token, {

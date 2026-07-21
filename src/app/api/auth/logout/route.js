@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { COOKIE_NAME } from '@/lib/adminAuth';
 
-// POST /api/auth/logout — Session cookie clear karo
+// POST /api/auth/logout — Clear the session cookie
 export async function POST(request) {
   const response = NextResponse.json({ message: 'Logged out' });
   response.cookies.set(COOKIE_NAME, '', {

@@ -13,7 +13,7 @@ export async function POST(request) {
     const file = formData.get('image');
 
     if (!file) {
-      return NextResponse.json({ message: 'Image nahi mili' }, { status: 400 });
+      return NextResponse.json({ message: 'No image was provided' }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();

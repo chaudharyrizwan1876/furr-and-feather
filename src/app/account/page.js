@@ -14,8 +14,8 @@ function AccountContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Session check — agar user pehle se logged-in hai to login form ki jagah
-  // sirf Logout wala view dikhayein (baaki details baad mein add hongi)
+  // Session check — if the user is already logged in, show a simple
+  // Logout-only view instead of the login form (more details added later)
   const [checkingSession, setCheckingSession] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -35,7 +35,7 @@ function AccountContent() {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSocialClick = (provider) => {
-    toast('Yeh feature jald hi available hoga', { icon: 'ℹ️' });
+    toast('This feature will be available soon', { icon: 'ℹ️' });
   };
 
   const redirectAfterAuth = (user) => {
@@ -51,7 +51,7 @@ function AccountContent() {
     e.preventDefault();
     setError('');
     if (!form.email.trim() || !form.password) {
-      setError('Email aur password dono zaroori hain');
+      setError('Email and password are both required');
       return;
     }
     setLoading(true);
@@ -63,13 +63,13 @@ function AccountContent() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message || 'Login fail ho gaya');
+        setError(data.message || 'Login failed');
         return;
       }
       toast.success(`Welcome back, ${data.user.name}!`);
       redirectAfterAuth(data.user);
     } catch (err) {
-      setError('Kuch ghalat ho gaya, dobara koshish karein');
+      setError('Something went wrong, please try again');
     } finally {
       setLoading(false);
     }
@@ -79,11 +79,11 @@ function AccountContent() {
     e.preventDefault();
     setError('');
     if (!form.name.trim() || !form.email.trim() || !form.password) {
-      setError('Naam, email aur password zaroori hain');
+      setError('Name, email and password are required');
       return;
     }
     if (form.password.length < 6) {
-      setError('Password kam az kam 6 characters ka hona chahiye');
+      setError('Password must be at least 6 characters long');
       return;
     }
     setLoading(true);
@@ -100,13 +100,13 @@ function AccountContent() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message || 'Account create nahi hua');
+        setError(data.message || 'Account could not be created');
         return;
       }
-      toast.success('Account ban gaya!');
+      toast.success('Account created!');
       redirectAfterAuth(data.user);
     } catch (err) {
-      setError('Kuch ghalat ho gaya, dobara koshish karein');
+      setError('Something went wrong, please try again');
     } finally {
       setLoading(false);
     }
@@ -133,8 +133,8 @@ function AccountContent() {
     );
   }
 
-  // Agar user pehle se logged-in hai — sirf Logout wala simple view
-  // (Naam/email/order jaisi details baad mein yahan add hongi)
+  // If the user is already logged in — show just the simple Logout view
+  // (name/email/order details will be added here later)
   if (currentUser) {
     return (
       <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>

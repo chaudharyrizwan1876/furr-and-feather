@@ -37,7 +37,7 @@ export default async function sitemap() {
       priority: 0.6,
     }));
   } catch (err) {
-    console.error('Sitemap: data fetch nahi hui', err);
+    console.error('Sitemap: failed to fetch data', err);
   }
 
   return [...staticPages, ...blogPages, ...productPages];

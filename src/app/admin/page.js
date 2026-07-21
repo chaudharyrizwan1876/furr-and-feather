@@ -26,7 +26,7 @@ export default function AdminDashboard() {
       const data = await res.json();
       setStats(data);
     } catch (err) {
-      console.error('Dashboard stats fetch nahi hui', err);
+      console.error('Failed to fetch dashboard stats', err);
     } finally {
       setLoading(false);
     }

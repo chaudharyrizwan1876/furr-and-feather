@@ -2,7 +2,7 @@ import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { NextResponse } from 'next/server';
 
-// GET /api/products — Sab products fetch karo (with filters)
+// GET /api/products — Fetch all products (with filters)
 export async function GET(request) {
   try {
     await connectDB();
@@ -46,7 +46,7 @@ export async function GET(request) {
   }
 }
 
-// POST /api/products — Naya product banao (Admin)
+// POST /api/products — Create a new product (Admin)
 export async function POST(request) {
   try {
     await connectDB();

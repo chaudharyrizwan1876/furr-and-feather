@@ -39,7 +39,7 @@ export default function OrdersPage() {
       const data = await res.json();
       setOrders(data);
     } catch (err) {
-      console.error('Orders fetch nahi hue', err);
+      console.error('Failed to fetch orders', err);
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ export default function OrdersPage() {
         setSelectedOrder(null);
       }
     } catch (err) {
-      alert('Status update nahi hua');
+      alert('Status could not be updated');
     } finally {
       setUpdating(false);
     }

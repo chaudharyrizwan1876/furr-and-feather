@@ -2,7 +2,7 @@ import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { NextResponse } from 'next/server';
 
-// GET /api/products/:id — Single product fetch karo
+// GET /api/products/:id — Fetch a single product
 export async function GET(request, { params }) {
   try {
     await connectDB();
@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
     const product = await Product.findById(id);
 
     if (!product) {
-      return NextResponse.json({ message: 'Product nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
 
     return NextResponse.json(product);
@@ -19,7 +19,7 @@ export async function GET(request, { params }) {
   }
 }
 
-// PUT /api/products/:id — Product update karo (Admin)
+// PUT /api/products/:id — Update a product (Admin)
 export async function PUT(request, { params }) {
   try {
     await connectDB();
@@ -29,7 +29,7 @@ export async function PUT(request, { params }) {
     const product = await Product.findById(id);
 
     if (!product) {
-      return NextResponse.json({ message: 'Product nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
 
     Object.keys(body).forEach((key) => {
@@ -44,7 +44,7 @@ export async function PUT(request, { params }) {
   }
 }
 
-// DELETE /api/products/:id — Product delete karo (Admin)
+// DELETE /api/products/:id — Delete a product (Admin)
 export async function DELETE(request, { params }) {
   try {
     await connectDB();
@@ -52,10 +52,10 @@ export async function DELETE(request, { params }) {
     const product = await Product.findByIdAndDelete(id);
 
     if (!product) {
-      return NextResponse.json({ message: 'Product nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'Product delete ho gaya' });
+    return NextResponse.json({ message: 'Product deleted' });
   } catch (error) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }

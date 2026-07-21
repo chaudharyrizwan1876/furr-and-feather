@@ -3,11 +3,11 @@ import Review from '@/models/Review';
 import Product from '@/models/Product';
 import { NextResponse } from 'next/server';
 
-// GET /api/reviews — Reviews fetch karo
-// Query params (dono optional):
-//   ?product=<productId> — sirf us product ke reviews
-//   ?approved=true — sirf approved reviews (customer-facing pages ke liye)
-// Bina params ke (admin use): sab reviews, sab products
+// GET /api/reviews — Fetch reviews
+// Query params (both optional):
+//   ?product=<productId> — only reviews for that product
+//   ?approved=true — only approved reviews (for customer-facing pages)
+// Without params (admin use): all reviews, all products
 export async function GET(request) {
   try {
     await connectDB();
@@ -28,25 +28,25 @@ export async function GET(request) {
   }
 }
 
-// POST /api/reviews — Customer review submit karo (guest ya logged-in dono ke liye)
-// Review by default pending hoti hai (isApproved: false) — admin approve karne par hi dikhai deti hai
+// POST /api/reviews — Submit a customer review (works for both guest and logged-in users)
+// Reviews are pending by default (isApproved: false) — only shown once approved by an admin
 export async function POST(request) {
   try {
     await connectDB();
     const { productId, customerName, rating, comment } = await request.json();
 
     if (!productId || !customerName?.trim() || !rating || !comment?.trim()) {
-      return NextResponse.json({ message: 'Sab fields zaroori hain' }, { status: 400 });
+      return NextResponse.json({ message: 'All fields are required' }, { status: 400 });
     }
 
     if (rating < 1 || rating > 5) {
-      return NextResponse.json({ message: 'Rating 1 se 5 ke darmiyan honi chahiye' }, { status: 400 });
+      return NextResponse.json({ message: 'Rating must be between 1 and 5' }, { status: 400 });
     }
 
-    // Check karein ke koi product exist karta hai
+    // Check that the product exists
     const product = await Product.findById(productId);
     if (!product) {
-      return NextResponse.json({ message: 'Product nahi mila' }, { status: 404 });
+      return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
 
     const review = await Review.create({
@@ -54,11 +54,11 @@ export async function POST(request) {
       customerName: customerName.trim(),
       rating: Number(rating),
       comment: comment.trim(),
-      isApproved: false, // Admin approve karne ke baad dikhegi
+      isApproved: false, // Will show once approved by an admin
     });
 
     return NextResponse.json({
-      message: 'Shukriya! Aapka review submit ho gaya. Admin approval ke baad yeh product par dikhai dega.',
+      message: 'Thank you! Your review has been submitted and will appear on the product page once approved.',
       review,
     }, { status: 201 });
   } catch (error) {
