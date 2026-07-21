@@ -12,9 +12,9 @@ const nextConfig = {
       },
     ],
     formats: ['image/avif', 'image/webp'], // Modern compressed formats — faster load
-    minimumCacheTTL: 60 * 60 * 24 * 30,  // 30 din cache — CDN par images fast serve hongi
+    minimumCacheTTL: 60 * 60 * 24 * 30,  // 30 day cache — images served fast via CDN
   },
-  // Gzip compression — page size kam karti hai
+  // Gzip compression — reduces page size
   compress: true,
 };
 
