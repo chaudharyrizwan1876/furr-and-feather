@@ -152,6 +152,7 @@ function ShopContent() {
       return priceB - priceA;
     }
     if (sortBy === 'newest') return new Date(b.createdAt) - new Date(a.createdAt);
+    if (sortBy === 'best-sellers') return (b.numSold || 0) - (a.numSold || 0);
     return 0;
   });
 
@@ -216,6 +217,7 @@ function ShopContent() {
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}
               style={{ padding: '10px 14px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '14px', backgroundColor: 'white' }}>
               <option value="our-order">Our Order</option>
+              <option value="best-sellers">Best Sellers</option>
               <option value="newest">Newest</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>

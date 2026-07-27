@@ -7,6 +7,17 @@ import useCartStore from '@/store/useCartStore';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
+// Converts a brand name to a URL-friendly slug — must match the same logic
+// used on the brand page (src/app/brand/[slug]/page.js)
+function slugifyBrand(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 function StarRating({ rating }) {
   return (
     <div style={{ display: 'flex', gap: '2px' }}>
@@ -131,6 +142,40 @@ export default function ProductDetailPage({ params }) {
     }),
   };
 
+  // JSON-LD FAQ Schema for Google Rich Results — generic questions that apply
+  // to every product (delivery, COD, returns). Google can show these as an
+  // expandable FAQ dropdown directly in search results.
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Is Cash on Delivery (COD) available for this product?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, Cash on Delivery is available for same-day delivery in Rawalpindi and Islamabad. For other cities across Pakistan, online payment (Easypaisa, JazzCash, or Bank Transfer) is required in advance.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How long does delivery take?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Orders in Rawalpindi and Islamabad are typically delivered the same day. Orders to other cities across Pakistan are usually delivered within 2 to 5 working days.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is this product genuine and authentic?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: "Yes, all products sold at Furr & Feather's Hospital are 100% genuine and sourced directly from authorized distributors.",
+        },
+      },
+    ],
+  };
+
   const handleAddToCart = () => {
     addItem(product, quantity, selectedVariant);
     const label = selectedVariant ? `${product.name} (${selectedVariant.label})` : product.name;
@@ -179,10 +224,14 @@ export default function ProductDetailPage({ params }) {
 
   return (
     <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
-      {/* JSON-LD Schema — Google Rich Results ke liye */}
+      {/* JSON-LD Schema — for Google Rich Results */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       {/* Breadcrumb */}
       <div style={{ backgroundColor: 'white', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
@@ -311,7 +360,9 @@ export default function ProductDetailPage({ params }) {
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
               {product.sku && <span>SKU: <strong>{product.sku}</strong></span>}
               {product.unit && <span>Unit: <strong>{product.unit}</strong></span>}
-              {product.brand && <span>Brand: <strong>{product.brand}</strong></span>}
+              {product.brand && (
+                <span>Brand: <Link href={`/brand/${slugifyBrand(product.brand)}`} style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'underline' }}>{product.brand}</Link></span>
+              )}
             </div>
 
             {/* Quantity */}

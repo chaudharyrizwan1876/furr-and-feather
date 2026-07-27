@@ -2,7 +2,16 @@ import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Blog from '@/models/Blog';
 
-const SITE_URL = 'https://furrandfeathers.com'; // ← Apna domain
+const SITE_URL = 'https://furrandfeathers.com'; // ← Your domain
+
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 export default async function sitemap() {
   // Static pages
@@ -17,16 +26,29 @@ export default async function sitemap() {
 
   let productPages = [];
   let blogPages = [];
+  let brandPages = [];
 
   try {
     await connectDB();
 
-    const products = await Product.find({ isActive: true }).select('slug updatedAt').lean();
+    const products = await Product.find({ isActive: true }).select('slug brand updatedAt').lean();
     productPages = products.map((product) => ({
       url: `${SITE_URL}/products/${product.slug}`,
       lastModified: product.updatedAt || new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
+    }));
+
+    // Unique brand slugs, derived from active products
+    const uniqueBrandSlugs = new Set();
+    products.forEach((p) => {
+      if (p.brand) uniqueBrandSlugs.add(slugify(p.brand));
+    });
+    brandPages = Array.from(uniqueBrandSlugs).map((brandSlug) => ({
+      url: `${SITE_URL}/brand/${brandSlug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
     }));
 
     const blogs = await Blog.find({ isPublished: true }).select('slug updatedAt').lean();
@@ -40,5 +62,5 @@ export default async function sitemap() {
     console.error('Sitemap: failed to fetch data', err);
   }
 
-  return [...staticPages, ...blogPages, ...productPages];
+  return [...staticPages, ...blogPages, ...brandPages, ...productPages];
 }
