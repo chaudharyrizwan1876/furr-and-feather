@@ -37,7 +37,7 @@ export default function ContactPage() {
             <h3 style={{ fontWeight: '700', fontSize: '18px', color: 'var(--primary)', marginBottom: '20px' }}>Get In Touch</h3>
 
             {[
-              { icon: <FiMapPin size={20} />, title: 'Address', value: '123 Veterinary Street, Lahore, Pakistan' },
+              { icon: <FiMapPin size={20} />, title: 'Address', value: 'Chandni Chowk, Murree Road, Rawalpindi' },
               { icon: <FiPhone size={20} />, title: 'Phone', value: '0300-1234567' },
               { icon: <FiMail size={20} />, title: 'Email', value: 'info@furrandfeathers.com' },
               { icon: <FiClock size={20} />, title: 'Working Hours', value: '9 AM - 9 PM, Mon - Sat' },
