@@ -38,9 +38,9 @@ export default function ContactPage() {
 
             {[
               { icon: <FiMapPin size={20} />, title: 'Address', value: 'Chandni Chowk, Murree Road, Rawalpindi' },
-              { icon: <FiPhone size={20} />, title: 'Phone', value: '0300-1234567' },
+              { icon: <FiPhone size={20} />, title: 'Phone', value: '+923295780676' },
               { icon: <FiMail size={20} />, title: 'Email', value: 'info@furrandfeathers.com' },
-              { icon: <FiClock size={20} />, title: 'Working Hours', value: '9 AM - 9 PM, Mon - Sat' },
+              { icon: <FiClock size={20} />, title: 'Working Hours', value: '10:00 AM - 10:00 PM' },
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '14px', marginBottom: '20px' }}>
                 <div style={{ backgroundColor: '#f0f1ff', color: 'var(--primary)', borderRadius: '10px', width: '42px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -96,16 +96,6 @@ export default function ContactPage() {
           <button onClick={handleSubmit} className="btn-primary" style={{ width: '100%', padding: '14px', fontSize: '15px' }}>
             Send Message
           </button>
-        </div>
-      </div>
-
-      {/* Map Placeholder */}
-      <div className="container" style={{ padding: '0 20px 40px' }}>
-        <div style={{ backgroundColor: 'white', borderRadius: '16px', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
-          <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-            <FiMapPin size={40} style={{ marginBottom: '10px' }} />
-            <p>Map will be embedded here</p>
-          </div>
         </div>
       </div>
     </div>

@@ -22,7 +22,7 @@ export async function generateMetadata({ params }) {
       product.shortDescription ||
       `${product.name} - ${product.category} - Genuine product available at Furr & Feather's Hospital Pakistan. COD available.`;
 
-    const imageUrl = product.images?.[0] || `${SITE_URL}/og-image.png`;
+    const imageUrl = product.images?.[0] || `${SITE_URL}/petsss.png`;
     const price = product.discountPrice > 0 && product.discountPrice < product.price
       ? product.discountPrice
       : product.price;

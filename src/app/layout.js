@@ -37,7 +37,7 @@ export const metadata = {
     description: "Pakistan's trusted veterinary online store. Genuine medicines, supplements & pet food. COD available.",
     images: [
       {
-        url: '/og-image.png', // 1200x630px image — place it in the public folder (optional, works fine without it too)
+        url: '/petsss.png', // fallback share image until a dedicated 1200x630 og-image.png is designed
         width: 1200,
         height: 630,
         alt: "Furr & Feather's Hospital — Pakistan's Trusted Pet Care Store",
@@ -50,7 +50,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: `${SITE_NAME} | Pet Medicines Pakistan`,
     description: 'Genuine pet medicines, supplements & food. COD Rawalpindi & Islamabad.',
-    images: ['/og-image.png'],
+    images: ['/petsss.png'],
   },
 
   // Robots
