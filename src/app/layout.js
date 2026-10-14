@@ -63,10 +63,10 @@ export const metadata = {
     },
   },
 
-  // Verification (for Google Search Console — add later)
-  // verification: {
-  //   google: 'YOUR_GOOGLE_VERIFICATION_CODE',
-  // },
+  // Verification (Google Search Console)
+  verification: {
+    google: '2pw4hs1NHQ5XbPMcwnEbWjWNnS5KWnw1bB-hgwTWZF0',
+  },
 
   // Favicon/icons — src/app/icon.png is picked up automatically by Next.js
   // (its file-naming convention), so no manual "icons" entry is needed here.
