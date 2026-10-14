@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Review from '@/models/Review';
@@ -31,13 +32,7 @@ export default async function ProductDetailPage({ params }) {
   const data = await getProductData(slug);
 
   if (!data) {
-    return (
-      <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', textAlign: 'center' }}>
-        <div style={{ fontSize: '56px', marginBottom: '16px' }}>📦</div>
-        <h2 style={{ color: 'var(--text)', marginBottom: '8px' }}>Product Not Found</h2>
-        <Link href="/shop" className="btn-primary" style={{ marginTop: '16px' }}>Back to Shop</Link>
-      </div>
-    );
+    notFound();
   }
 
   const { product, relatedProducts, reviews } = data;

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 import { toPlain } from '@/lib/serialize';
@@ -23,16 +24,7 @@ export default async function BlogDetailPage({ params }) {
   const data = await getBlogData(slug);
 
   if (!data) {
-    return (
-      <div style={{ backgroundColor: 'var(--bg)', minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '56px', marginBottom: '16px' }}>📄</div>
-          <h2 style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '8px' }}>Blog post not found</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>This article doesn't exist or has been removed.</p>
-          <Link href="/blog" className="btn-primary" style={{ display: 'inline-block', padding: '10px 24px' }}>Back to Blog</Link>
-        </div>
-      </div>
-    );
+    notFound();
   }
 
   const { post, relatedPosts } = data;
