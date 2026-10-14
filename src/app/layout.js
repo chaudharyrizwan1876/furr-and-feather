@@ -68,11 +68,8 @@ export const metadata = {
   //   google: 'YOUR_GOOGLE_VERIFICATION_CODE',
   // },
 
-  // Favicon/icons
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/favicon.ico',
-  },
+  // Favicon/icons — src/app/icon.png is picked up automatically by Next.js
+  // (its file-naming convention), so no manual "icons" entry is needed here.
 
   // App/PWA
   manifest: '/manifest.json',
