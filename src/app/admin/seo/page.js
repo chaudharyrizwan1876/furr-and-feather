@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { FiSearch, FiPlus, FiEdit2, FiTrash2, FiX, FiUploadCloud, FiExternalLink, FiEye, FiEyeOff } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import BlogEditor from '@/components/admin/BlogEditor';
 
 const emptyForm = {
   title: '', slug: '', content: '', excerpt: '', category: 'General', author: 'Admin',
@@ -340,11 +341,9 @@ export default function AdminSeoPage() {
 
               <div>
                 <label style={{ fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '6px' }}>
-                  Content * <span style={{ fontWeight: '400', color: 'var(--text-muted)' }}>(HTML supported — &lt;h2&gt;, &lt;p&gt;, &lt;a&gt;, &lt;ul&gt;, &lt;strong&gt;, &lt;img&gt;. Plain text with blank-line paragraphs still works too.)</span>
+                  Content * <span style={{ fontWeight: '400', color: 'var(--text-muted)' }}>(use the toolbar for bold, headings, bullet points and links — what you see here is what gets published)</span>
                 </label>
-                <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} rows={14}
-                  placeholder="Paste the full blog post HTML here (or write plain text — one paragraph per line)."
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '13px', resize: 'vertical', fontFamily: 'monospace' }} />
+                <BlogEditor key={editingId || 'new'} value={form.content} onChange={(html) => setForm((f) => ({ ...f, content: html }))} />
               </div>
 
               <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
