@@ -1,5 +1,6 @@
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
+import { requireAdmin } from '@/lib/requireAdmin';
 import { NextResponse } from 'next/server';
 
 // GET /api/blogs/:id — Fetch a single blog (for the edit form)
@@ -20,6 +21,11 @@ export async function GET(request, { params }) {
 // PUT /api/blogs/:id — Update a blog
 export async function PUT(request, { params }) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
     const body = await request.json();
@@ -43,6 +49,11 @@ export async function PUT(request, { params }) {
 // DELETE /api/blogs/:id — Delete a blog
 export async function DELETE(request, { params }) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
     const blog = await Blog.findByIdAndDelete(id);

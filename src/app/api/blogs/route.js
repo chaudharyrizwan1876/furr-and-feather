@@ -1,5 +1,6 @@
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
+import { requireAdmin } from '@/lib/requireAdmin';
 import { NextResponse } from 'next/server';
 
 // GET /api/blogs — Fetch all blogs
@@ -29,9 +30,20 @@ function generateSlug(title) {
     .replace(/^-+|-+$/g, '');
 }
 
+// Strips HTML tags so an auto-generated excerpt (from HTML content) reads
+// as plain text instead of showing raw/truncated markup.
+function stripHtml(html) {
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 // POST /api/blogs — Create a new blog post
 export async function POST(request) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const body = await request.json();
 
@@ -53,7 +65,7 @@ export async function POST(request) {
       title: body.title.trim(),
       slug: uniqueSlug,
       content: body.content,
-      excerpt: body.excerpt?.trim() || body.content.slice(0, 150) + '...',
+      excerpt: body.excerpt?.trim() || stripHtml(body.content).slice(0, 150) + '...',
       image: body.image || '',
       category: body.category || 'General',
       author: body.author?.trim() || 'Admin',

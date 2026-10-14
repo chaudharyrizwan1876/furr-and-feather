@@ -52,8 +52,12 @@ export default async function BlogDetailPage({ params }) {
   }
 
   const { post, relatedPosts, relatedProducts, shopUrl, shopLabel } = data;
-  // Split the content into paragraphs (if the admin separated paragraphs with a blank line)
-  const paragraphs = post.content.split('\n').filter((p) => p.trim());
+  // Content can be written as semantic HTML (headings, links, lists — styled
+  // by the .blog-content rules in globals.css) for proper formatting and
+  // internal links. Older plain-text posts (no HTML tags) still fall back
+  // to one paragraph per line, same as before.
+  const isHtmlContent = /<[a-z][\s\S]*>/i.test(post.content);
+  const paragraphs = isHtmlContent ? [] : post.content.split('\n').filter((p) => p.trim());
 
   // JSON-LD Article schema — lets Google show author/date in search results
   const articleSchema = {
@@ -107,9 +111,13 @@ export default async function BlogDetailPage({ params }) {
             </div>
           )}
 
-          {paragraphs.map((para, i) => (
-            <p key={i} style={{ fontSize: '15px', lineHeight: '1.9', color: 'var(--text)', marginBottom: '18px' }}>{para}</p>
-          ))}
+          {isHtmlContent ? (
+            <div className="blog-content" dangerouslySetInnerHTML={{ __html: post.content }} />
+          ) : (
+            paragraphs.map((para, i) => (
+              <p key={i} style={{ fontSize: '15px', lineHeight: '1.9', color: 'var(--text)', marginBottom: '18px' }}>{para}</p>
+            ))
+          )}
 
           {/* Share */}
           <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>

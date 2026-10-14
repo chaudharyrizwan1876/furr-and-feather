@@ -339,10 +339,12 @@ export default function AdminSeoPage() {
               </div>
 
               <div>
-                <label style={{ fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '6px' }}>Content *</label>
-                <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} rows={8}
-                  placeholder="Write the full blog content here. Press Enter to start a new paragraph."
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '14px', resize: 'vertical', fontFamily: 'inherit' }} />
+                <label style={{ fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '6px' }}>
+                  Content * <span style={{ fontWeight: '400', color: 'var(--text-muted)' }}>(HTML supported — &lt;h2&gt;, &lt;p&gt;, &lt;a&gt;, &lt;ul&gt;, &lt;strong&gt;, &lt;img&gt;. Plain text with blank-line paragraphs still works too.)</span>
+                </label>
+                <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} rows={14}
+                  placeholder="Paste the full blog post HTML here (or write plain text — one paragraph per line)."
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '13px', resize: 'vertical', fontFamily: 'monospace' }} />
               </div>
 
               <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>

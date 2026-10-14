@@ -81,3 +81,85 @@ body {
   margin: 0 auto;
   padding: 0 20px;
 }
+
+/* Styling for admin-authored blog post HTML (src/app/blog/[slug]/page.js).
+   Content is written as semantic tags (h2, p, a, ul, strong, img) with no
+   inline styles — these rules give it consistent typography and make
+   internal links to products/categories stand out. */
+.blog-content {
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--text);
+}
+
+.blog-content p {
+  margin-bottom: 18px;
+}
+
+.blog-content h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 32px 0 14px;
+  line-height: 1.3;
+}
+
+.blog-content h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 26px 0 12px;
+  line-height: 1.3;
+}
+
+.blog-content a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.blog-content ul,
+.blog-content ol {
+  margin: 0 0 18px 22px;
+}
+
+.blog-content li {
+  margin-bottom: 8px;
+}
+
+.blog-content strong {
+  font-weight: 700;
+}
+
+.blog-content img {
+  width: 100%;
+  border-radius: 12px;
+  margin: 10px 0 24px;
+}
+
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.blog-content th,
+.blog-content td {
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.blog-content th {
+  background-color: var(--bg);
+  font-weight: 700;
+}
+
+.blog-content blockquote {
+  border-left: 3px solid var(--primary);
+  padding: 4px 0 4px 16px;
+  margin: 0 0 18px;
+  color: var(--text-muted);
+  font-style: italic;
+}
