@@ -3,21 +3,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FiTag, FiArrowRight } from 'react-icons/fi';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { CATEGORIES } from '@/lib/categories';
 
-const categories = [
-  { name: 'Dog Medicines', icon: '🐕' },
-  { name: 'Cat Medicines', icon: '🐈' },
-  { name: 'Cat & Dog Medicines', icon: '🐾', combined: true },
-  { name: 'Bird Medicines', icon: '🦜' },
-  { name: 'Parasite Treatment', icon: '💊' },
-  { name: 'Deworming', icon: '💊' },
-  { name: 'Supplements', icon: '💊' },
-  { name: 'Pet Food', icon: '🍖' },
-  { name: 'Pain Relief & Symptomatic Care', icon: '💉' },
-  { name: 'Skin & External Care', icon: '🧴' },
-  { name: 'Equipment & Devices', icon: '🔧' },
-  { name: 'Accessories', icon: '🎾' },
-];
+const categories = CATEGORIES;
 
 export default function AdminCategoriesPage() {
   const [counts, setCounts] = useState({});
@@ -69,7 +57,7 @@ export default function AdminCategoriesPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '14px' }}>
         {categories.map((cat) => (
-          <Link key={cat.name} href={`/shop?category=${encodeURIComponent(cat.name)}`} target="_blank" style={{ textDecoration: 'none' }}>
+          <Link key={cat.name} href={`/shop/${cat.slug}`} target="_blank" style={{ textDecoration: 'none' }}>
             <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '18px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: '14px', transition: 'transform 0.2s', cursor: 'pointer' }}
               onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-3px)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>

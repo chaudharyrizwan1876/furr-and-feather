@@ -1,28 +1,29 @@
+import { redirect } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { toPlain } from '@/lib/serialize';
+import { categoryUrl } from '@/lib/categories';
 import ShopView from '@/components/ShopView';
 
-async function getProducts(category) {
+async function getAllProducts() {
   await connectDB();
-  const filter = { isActive: true };
-  if (category) {
-    if (category === 'Cat & Dog Medicines') {
-      filter.category = { $in: ['Cat & Dog Medicines', 'Cat Medicines', 'Dog Medicines'] };
-    } else {
-      filter.category = category;
-    }
-  }
-  const products = await Product.find(filter).sort({ createdAt: -1 }).lean();
+  const products = await Product.find({ isActive: true }).sort({ createdAt: -1 }).lean();
   return toPlain(products);
 }
 
 export default async function ShopPage({ searchParams }) {
   const sp = await searchParams;
-  const category = sp?.category || 'All';
+
+  // Old-style links (?category=Dog+Medicines) now have a dedicated URL at
+  // /shop/[category] — redirect so there's one canonical URL per category
+  // instead of two different ones with the same content.
+  if (sp?.category) {
+    const url = categoryUrl(sp.category);
+    redirect(url !== '/shop' ? `${url}${sp.featured === 'true' ? '?featured=true' : ''}` : '/shop');
+  }
+
   const featured = sp?.featured === 'true';
+  const products = await getAllProducts();
 
-  const products = await getProducts(category !== 'All' ? category : undefined);
-
-  return <ShopView initialProducts={products} initialCategory={category} initialFeatured={featured} />;
+  return <ShopView initialProducts={products} initialCategory="All" initialFeatured={featured} />;
 }

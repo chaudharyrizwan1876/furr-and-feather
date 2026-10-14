@@ -8,26 +8,12 @@ import Review from '@/models/Review';
 import { toPlain } from '@/lib/serialize';
 import ProductCard, { StarRating } from '@/components/ProductCard';
 import CategoryCard from '@/components/CategoryCard';
+import { CATEGORIES } from '@/lib/categories';
 
 // Always render fresh from the database — admin changes (new products,
 // featured order, approved reviews) must show immediately, not only after
 // the next deploy.
 export const dynamic = 'force-dynamic';
-
-const categories = [
-  { name: 'Dog Medicines', slug: 'Dog Medicines', fallbackIcon: '🐕' },
-  { name: 'Cat Medicines', slug: 'Cat Medicines', fallbackIcon: '🐈' },
-  { name: 'Cat & Dog Medicines', slug: 'Cat & Dog Medicines', fallbackIcon: '🐾' },
-  { name: 'Bird Medicines', slug: 'Bird Medicines', fallbackIcon: '🦜' },
-  { name: 'Parasite Treatment', slug: 'Parasite Treatment', fallbackIcon: '💊' },
-  { name: 'Deworming', slug: 'Deworming', fallbackIcon: '💊' },
-  { name: 'Supplements', slug: 'Supplements', fallbackIcon: '💊' },
-  { name: 'Pet Food', slug: 'Pet Food', fallbackIcon: '🍖' },
-  { name: 'Pain Relief & Symptomatic Care', slug: 'Pain Relief & Symptomatic Care', fallbackIcon: '💉' },
-  { name: 'Skin & External Care', slug: 'Skin & External Care', fallbackIcon: '🧴' },
-  { name: 'Equipment & Devices', slug: 'Equipment & Devices', fallbackIcon: '🔧' },
-  { name: 'Accessories', slug: 'Accessories', fallbackIcon: '🦴' },
-];
 
 const trustBadges = [
   { icon: <FiShield size={28} />, title: 'Genuine Products', desc: 'Trusted and Certified' },
@@ -53,16 +39,16 @@ async function getHomeData() {
 
   const categoryImages = {};
   const categoryCounts = {};
-  categories.forEach((cat) => {
+  CATEGORIES.forEach((cat) => {
     let productsInCat;
-    if (cat.slug === 'Cat & Dog Medicines') {
+    if (cat.combined) {
       productsInCat = allProducts.filter((p) => ['Cat & Dog Medicines', 'Cat Medicines', 'Dog Medicines'].includes(p.category));
     } else {
-      productsInCat = allProducts.filter((p) => p.category === cat.slug);
+      productsInCat = allProducts.filter((p) => p.category === cat.name);
     }
-    categoryCounts[cat.slug] = productsInCat.length;
+    categoryCounts[cat.name] = productsInCat.length;
     const withImage = productsInCat.find((p) => p.images && p.images[0]);
-    if (withImage) categoryImages[cat.slug] = withImage.images[0];
+    if (withImage) categoryImages[cat.name] = withImage.images[0];
   });
 
   // Featured products — sorted by featuredOrder, set in the admin panel
@@ -165,14 +151,14 @@ export default async function HomePage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px' }}
             data-category-grid>
-            {categories.map((cat) => (
+            {CATEGORIES.map((cat) => (
               <CategoryCard
                 key={cat.slug}
-                href={`/shop?category=${encodeURIComponent(cat.slug)}`}
-                image={categoryImages[cat.slug]}
-                icon={cat.fallbackIcon}
+                href={`/shop/${cat.slug}`}
+                image={categoryImages[cat.name]}
+                icon={cat.icon}
                 name={cat.name}
-                count={categoryCounts[cat.slug] || 0}
+                count={categoryCounts[cat.name] || 0}
               />
             ))}
           </div>

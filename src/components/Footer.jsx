@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaFacebook, FaInstagram, FaYoutube, FaWhatsapp } from 'react-icons/fa';
+import { CATEGORIES } from '@/lib/categories';
 
 export default function Footer() {
   return (
@@ -58,12 +59,12 @@ export default function Footer() {
           {/* Categories */}
           <div>
             <h4 style={{ fontWeight: '700', marginBottom: '10px', fontSize: '14px' }}>Categories</h4>
-            {['Dog Medicines', 'Cat Medicines', 'Bird Medicines', 'Parasite Treatment', 'Deworming', 'Supplements', 'Pet Food', 'Pain Relief & Symptomatic Care', 'Skin & External Care', 'Equipment & Devices', 'Accessories'].map((cat) => (
-              <Link key={cat} href={`/shop?category=${encodeURIComponent(cat)}`} style={{ display: 'block', color: 'rgba(255,255,255,0.8)', textDecoration: 'none', marginBottom: '6px', fontSize: '13px' }}
+            {CATEGORIES.filter((c) => !c.combined).map((cat) => (
+              <Link key={cat.slug} href={`/shop/${cat.slug}`} style={{ display: 'block', color: 'rgba(255,255,255,0.8)', textDecoration: 'none', marginBottom: '6px', fontSize: '13px' }}
                 onMouseEnter={e => e.target.style.opacity = '1'}
                 onMouseLeave={e => e.target.style.opacity = '0.8'}
               >
-                → {cat}
+                → {cat.name}
               </Link>
             ))}
           </div>
@@ -72,7 +73,7 @@ export default function Footer() {
           <div>
             <h4 style={{ fontWeight: '700', marginBottom: '10px', fontSize: '14px' }}>Contact Us</h4>
             <div style={{ fontSize: '13px', lineHeight: '1.8', opacity: 0.85 }}>
-              <p>📍 Islamabad, Pakistan</p>
+              <p>📍 Murree Road, Rawalpindi</p>
               <p>📞 03295780676</p>
               <p>✉️ info@furrandfeathers.com</p>
               <p style={{ marginTop: '8px', fontWeight: '600' }}>Payment Methods:</p>

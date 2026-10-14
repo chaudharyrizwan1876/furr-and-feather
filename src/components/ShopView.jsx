@@ -6,12 +6,9 @@ import { FiFilter, FiX } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import useCartStore from '@/store/useCartStore';
 import BackButton from '@/components/BackButton';
+import { CATEGORIES, categoryUrl } from '@/lib/categories';
 
-const categories = [
-  'All', 'Dog Medicines', 'Cat Medicines', 'Cat & Dog Medicines', 'Bird Medicines',
-  'Parasite Treatment', 'Deworming', 'Supplements', 'Pet Food',
-  'Pain Relief & Symptomatic Care', 'Skin & External Care', 'Equipment & Devices', 'Accessories',
-];
+const categories = ['All', ...CATEGORIES.map((c) => c.name)];
 
 function FilterPanel({ selectedCategory, handleCategoryChange, priceRange, setPriceRange, sortBy, setSortBy, featuredOnly, setFeaturedOnly, setSearchQuery }) {
   return (
@@ -77,13 +74,10 @@ export default function ShopView({ initialProducts, initialCategory, initialFeat
     sessionStorage.setItem('shop-scroll-position', String(window.scrollY));
   };
 
-  // Changing category navigates — the server re-fetches the product list for
-  // the new category and re-renders the page with it.
+  // Changing category navigates to that category's dedicated URL — the
+  // server re-fetches the product list for it and re-renders the page.
   const handleCategoryChange = (cat) => {
-    const qp = new URLSearchParams();
-    if (cat !== 'All') qp.set('category', cat);
-    const qs = qp.toString();
-    router.push(qs ? `/shop?${qs}` : '/shop', { scroll: false });
+    router.push(cat === 'All' ? '/shop' : categoryUrl(cat), { scroll: false });
     setFiltersOpen(false);
   };
 

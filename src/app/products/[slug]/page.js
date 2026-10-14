@@ -4,6 +4,7 @@ import Product from '@/models/Product';
 import Review from '@/models/Review';
 import { toPlain } from '@/lib/serialize';
 import { SITE_URL } from '@/lib/site';
+import { categoryUrl } from '@/lib/categories';
 import BackButton from '@/components/BackButton';
 import ProductView from '@/components/ProductView';
 
@@ -111,7 +112,7 @@ export default async function ProductDetailPage({ params }) {
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
       { '@type': 'ListItem', position: 2, name: 'Shop', item: `${SITE_URL}/shop` },
-      { '@type': 'ListItem', position: 3, name: product.category, item: `${SITE_URL}/shop?category=${encodeURIComponent(product.category)}` },
+      { '@type': 'ListItem', position: 3, name: product.category, item: `${SITE_URL}${categoryUrl(product.category)}` },
       { '@type': 'ListItem', position: 4, name: product.name, item: `${SITE_URL}/products/${product.slug}` },
     ],
   };
@@ -132,7 +133,7 @@ export default async function ProductDetailPage({ params }) {
             {' → '}
             <Link href="/shop" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Shop</Link>
             {' → '}
-            <Link href={`/shop?category=${encodeURIComponent(product.category)}`} style={{ color: 'var(--primary)', textDecoration: 'none' }}>{product.category}</Link>
+            <Link href={categoryUrl(product.category)} style={{ color: 'var(--primary)', textDecoration: 'none' }}>{product.category}</Link>
             {' → '}
             <span>{product.name}</span>
           </div>

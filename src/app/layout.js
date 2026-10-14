@@ -83,10 +83,38 @@ export const viewport = {
   themeColor: '#2F7D3A',
 };
 
+// Organization/LocalBusiness schema — tells Google this is a real local
+// business (name, address, phone, hours), which feeds the Knowledge Panel
+// and local search results, not just the usual blue links.
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: SITE_NAME,
+  url: SITE_URL,
+  image: `${SITE_URL}${DEFAULT_OG_IMAGE}`,
+  telephone: '+923295780676',
+  email: 'info@furrandfeathers.com',
+  priceRange: 'Rs. 250 - Rs. 30,000',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Chandni Chowk, Murree Road',
+    addressLocality: 'Rawalpindi',
+    addressCountry: 'PK',
+  },
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    opens: '10:00',
+    closes: '22:00',
+  },
+  areaServed: ['Rawalpindi', 'Islamabad', 'Pakistan'],
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
         <Toaster position="top-right" />
         <Navbar />
         {children}

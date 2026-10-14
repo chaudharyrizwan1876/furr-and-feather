@@ -2,6 +2,7 @@ import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Blog from '@/models/Blog';
 import { SITE_URL } from '@/lib/site';
+import { CATEGORIES } from '@/lib/categories';
 
 function slugify(text) {
   return text
@@ -17,6 +18,12 @@ export default async function sitemap() {
   const staticPages = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
     { url: `${SITE_URL}/shop`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    ...CATEGORIES.map((cat) => ({
+      url: `${SITE_URL}/shop/${cat.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.85,
+    })),
     { url: `${SITE_URL}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
     { url: `${SITE_URL}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
     { url: `${SITE_URL}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
