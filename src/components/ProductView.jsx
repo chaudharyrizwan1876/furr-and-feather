@@ -4,17 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import useCartStore from '@/store/useCartStore';
 import toast from 'react-hot-toast';
-
-// Converts a brand name to a URL-friendly slug — must match the logic used
-// everywhere else a brand link is generated.
-function slugifyBrand(text) {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+import { slugify as slugifyBrand } from '@/lib/slugify';
 
 function StarRating({ rating }) {
   return (

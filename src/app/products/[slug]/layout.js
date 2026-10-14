@@ -1,6 +1,6 @@
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
-import { SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/site';
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '@/lib/site';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -16,7 +16,12 @@ export async function generateMetadata({ params }) {
       };
     }
 
-    const title = product.metaTitle || `${product.name} | Furr & Feather's Hospital`;
+    // "title" feeds the <title> tag, which the root layout already
+    // templates as "%s | SITE_NAME" — appending the site name here too
+    // would show it twice. openGraph/twitter titles aren't templated, so
+    // they get their own version with the site name included.
+    const title = product.metaTitle || product.name;
+    const ogTitle = product.metaTitle || `${product.name} | ${SITE_NAME}`;
     const description = product.metaDescription ||
       product.shortDescription ||
       `${product.name} - ${product.category} - Genuine product available at Furr & Feather's Hospital Pakistan. COD available.`;
@@ -38,7 +43,7 @@ export async function generateMetadata({ params }) {
         canonical: `${SITE_URL}/products/${slug}`,
       },
       openGraph: {
-        title,
+        title: ogTitle,
         description,
         url: `${SITE_URL}/products/${slug}`,
         type: 'website',
@@ -46,7 +51,7 @@ export async function generateMetadata({ params }) {
       },
       twitter: {
         card: 'summary_large_image',
-        title,
+        title: ogTitle,
         description,
         images: [imageUrl],
       },

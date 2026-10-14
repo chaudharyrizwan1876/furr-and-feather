@@ -2,8 +2,21 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
+import Product from '@/models/Product';
 import { toPlain } from '@/lib/serialize';
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '@/lib/site';
+import { categoryUrl } from '@/lib/categories';
 import BackButton from '@/components/BackButton';
+import ProductCard from '@/components/ProductCard';
+
+// Blog categories don't use the same names as product categories — this
+// maps a post's category to the product category its readers are most
+// likely shopping for, so the article can link straight to those products.
+const BLOG_TO_PRODUCT_CATEGORY = {
+  'Dog Care': 'Dog Medicines',
+  'Cat Care': 'Cat Medicines',
+  'Bird Care': 'Bird Medicines',
+};
 
 async function getBlogData(slug) {
   await connectDB();
@@ -16,7 +29,18 @@ async function getBlogData(slug) {
     .lean();
   const relatedPosts = toPlain(relatedDocs);
 
-  return { post, relatedPosts };
+  // Products relevant to this article — from the matching product category
+  // when there is one, otherwise just the store's featured picks. Either
+  // way, the article links through to real product/category pages instead
+  // of being a dead end.
+  const productCategory = BLOG_TO_PRODUCT_CATEGORY[post.category];
+  const productFilter = productCategory ? { category: productCategory, isActive: true } : { isActive: true, isFeatured: true };
+  const relatedProductDocs = await Product.find(productFilter).limit(4).lean();
+  const relatedProducts = toPlain(relatedProductDocs);
+  const shopUrl = productCategory ? categoryUrl(productCategory) : '/shop';
+  const shopLabel = productCategory || 'All Products';
+
+  return { post, relatedPosts, relatedProducts, shopUrl, shopLabel };
 }
 
 export default async function BlogDetailPage({ params }) {
@@ -27,12 +51,32 @@ export default async function BlogDetailPage({ params }) {
     notFound();
   }
 
-  const { post, relatedPosts } = data;
+  const { post, relatedPosts, relatedProducts, shopUrl, shopLabel } = data;
   // Split the content into paragraphs (if the admin separated paragraphs with a blank line)
   const paragraphs = post.content.split('\n').filter((p) => p.trim());
 
+  // JSON-LD Article schema — lets Google show author/date in search results
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt || '',
+    image: [post.image || `${SITE_URL}${DEFAULT_OG_IMAGE}`],
+    datePublished: post.createdAt,
+    dateModified: post.updatedAt || post.createdAt,
+    author: { '@type': 'Organization', name: post.author || SITE_NAME },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      logo: { '@type': 'ImageObject', url: `${SITE_URL}${DEFAULT_OG_IMAGE}` },
+    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${post.slug}` },
+  };
+
   return (
     <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+
       {/* Breadcrumb */}
       <div style={{ backgroundColor: 'white', padding: '14px 20px', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
@@ -74,6 +118,22 @@ export default async function BlogDetailPage({ params }) {
             <button style={{ padding: '6px 16px', borderRadius: '20px', border: 'none', backgroundColor: '#25D366', color: 'white', cursor: 'pointer', fontSize: '13px' }}>WhatsApp</button>
           </div>
         </div>
+
+        {/* Shop Related Products — links the article through to the actual
+            products its readers are likely looking for */}
+        {relatedProducts.length > 0 && (
+          <div style={{ marginTop: '28px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--primary)' }}>Shop {shopLabel}</h2>
+              <Link href={shopUrl} style={{ fontSize: '13px', fontWeight: '600', color: 'var(--primary)', textDecoration: 'none' }}>View All →</Link>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
+              {relatedProducts.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
