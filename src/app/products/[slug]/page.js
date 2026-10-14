@@ -1,45 +1,145 @@
+import Link from 'next/link';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Review from '@/models/Review';
-import ProductClient from './ProductClient';
+import { toPlain } from '@/lib/serialize';
+import { SITE_URL } from '@/lib/site';
+import BackButton from '@/components/BackButton';
+import ProductView from '@/components/ProductView';
 
-// Stock, price and reviews change from the admin panel at any time — render
-// this per-request instead of freezing a static snapshot at build time.
-export const dynamic = 'force-dynamic';
+async function getProductData(slug) {
+  await connectDB();
+  const productDoc = await Product.findOne({ slug, isActive: true }).lean();
+  if (!productDoc) return null;
 
-function toPlain(doc) {
-  return JSON.parse(JSON.stringify(doc));
+  const product = toPlain(productDoc);
+
+  const relatedDocs = await Product.find({ category: product.category, isActive: true, _id: { $ne: product._id } })
+    .limit(4)
+    .lean();
+  const relatedProducts = toPlain(relatedDocs);
+
+  const reviewDocs = await Review.find({ product: product._id, isApproved: true }).sort({ createdAt: -1 }).lean();
+  const reviews = toPlain(reviewDocs);
+
+  return { product, relatedProducts, reviews };
 }
 
-// Server Component — fetches the product, its related products and its
-// approved reviews straight from the database, so the real content (name,
-// price, description, reviews, JSON-LD schema) is already present in the
-// first HTML response instead of appearing only after client-side JS fetches
-// it. This is what lets individual medicine pages actually get indexed and
-// ranked well.
 export default async function ProductDetailPage({ params }) {
   const { slug } = await params;
-  await connectDB();
+  const data = await getProductData(slug);
 
-  const product = await Product.findOne({ slug, isActive: true }).lean();
-
-  if (!product) {
-    return <ProductClient product={null} relatedProducts={[]} reviews={[]} />;
+  if (!data) {
+    return (
+      <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', textAlign: 'center' }}>
+        <div style={{ fontSize: '56px', marginBottom: '16px' }}>📦</div>
+        <h2 style={{ color: 'var(--text)', marginBottom: '8px' }}>Product Not Found</h2>
+        <Link href="/shop" className="btn-primary" style={{ marginTop: '16px' }}>Back to Shop</Link>
+      </div>
+    );
   }
 
-  const [relatedRaw, reviewsRaw] = await Promise.all([
-    Product.find({ category: product.category, isActive: true, _id: { $ne: product._id } })
-      .sort({ createdAt: -1 })
-      .limit(4)
-      .lean(),
-    Review.find({ product: product._id, isApproved: true }).sort({ createdAt: -1 }).lean(),
-  ]);
+  const { product, relatedProducts, reviews } = data;
+  const hasDiscount = product.discountPrice > 0 && product.discountPrice < product.price;
+
+  // JSON-LD Product Schema for Google Rich Results
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.shortDescription || product.description || '',
+    image: product.images || [],
+    brand: { '@type': 'Brand', name: product.brand || "Furr & Feather's Hospital" },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'PKR',
+      price: hasDiscount ? product.discountPrice : product.price,
+      availability: product.stock > 0
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: { '@type': 'Organization', name: "Furr & Feather's Hospital" },
+    },
+    ...(product.numReviews > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: product.rating,
+        reviewCount: product.numReviews,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    }),
+  };
+
+  // JSON-LD FAQ Schema for Google Rich Results — generic questions that apply
+  // to every product (delivery, COD, returns). Google can show these as an
+  // expandable FAQ dropdown directly in search results.
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Is Cash on Delivery (COD) available for this product?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes, Cash on Delivery is available for same-day delivery in Rawalpindi and Islamabad. For other cities across Pakistan, online payment (Easypaisa, JazzCash, or Bank Transfer) is required in advance.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How long does delivery take?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Orders in Rawalpindi and Islamabad are typically delivered the same day. Orders to other cities across Pakistan are usually delivered within 2 to 5 working days.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Is this product genuine and authentic?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: "Yes, all products sold at Furr & Feather's Hospital are 100% genuine and sourced directly from authorized distributors.",
+        },
+      },
+    ],
+  };
+
+  // JSON-LD Breadcrumb Schema
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'Shop', item: `${SITE_URL}/shop` },
+      { '@type': 'ListItem', position: 3, name: product.category, item: `${SITE_URL}/shop?category=${encodeURIComponent(product.category)}` },
+      { '@type': 'ListItem', position: 4, name: product.name, item: `${SITE_URL}/products/${product.slug}` },
+    ],
+  };
 
   return (
-    <ProductClient
-      product={toPlain(product)}
-      relatedProducts={toPlain(relatedRaw)}
-      reviews={toPlain(reviewsRaw)}
-    />
+    <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
+      {/* JSON-LD Schema — for Google Rich Results */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+
+      {/* Breadcrumb */}
+      <div style={{ backgroundColor: 'white', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+        <div className="container">
+          <BackButton fallback="/shop" />
+          <div style={{ fontSize: '13px', color: 'var(--text-muted)', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+            <Link href="/" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Home</Link>
+            {' → '}
+            <Link href="/shop" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Shop</Link>
+            {' → '}
+            <Link href={`/shop?category=${encodeURIComponent(product.category)}`} style={{ color: 'var(--primary)', textDecoration: 'none' }}>{product.category}</Link>
+            {' → '}
+            <span>{product.name}</span>
+          </div>
+        </div>
+      </div>
+
+      <ProductView product={product} relatedProducts={relatedProducts} reviews={reviews} />
+    </div>
   );
 }

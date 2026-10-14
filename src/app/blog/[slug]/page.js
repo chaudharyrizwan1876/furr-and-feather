@@ -1,51 +1,28 @@
-'use client';
-import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FiArrowLeft } from 'react-icons/fi';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import connectDB from '@/lib/mongodb';
+import Blog from '@/models/Blog';
+import { toPlain } from '@/lib/serialize';
+import BackButton from '@/components/BackButton';
 
-export default function BlogDetailPage({ params }) {
-  const router = useRouter();
-  const { slug } = use(params);
-  const [post, setPost] = useState(null);
-  const [relatedPosts, setRelatedPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
+async function getBlogData(slug) {
+  await connectDB();
+  const postDoc = await Blog.findOne({ slug, isPublished: true }).lean();
+  if (!postDoc) return null;
+  const post = toPlain(postDoc);
 
-  useEffect(() => {
-    fetchPost();
-  }, [slug]);
+  const relatedDocs = await Blog.find({ category: post.category, isPublished: true, slug: { $ne: post.slug } })
+    .limit(2)
+    .lean();
+  const relatedPosts = toPlain(relatedDocs);
 
-  const fetchPost = async () => {
-    setLoading(true);
-    setNotFound(false);
-    try {
-      const res = await fetch('/api/blogs?published=true');
-      const allBlogs = await res.json();
-      const found = allBlogs.find((p) => p.slug === slug);
+  return { post, relatedPosts };
+}
 
-      if (!found) {
-        setNotFound(true);
-        return;
-      }
-      setPost(found);
+export default async function BlogDetailPage({ params }) {
+  const { slug } = await params;
+  const data = await getBlogData(slug);
 
-      const related = allBlogs.filter((p) => p.category === found.category && p.slug !== found.slug).slice(0, 2);
-      setRelatedPosts(related);
-    } catch (err) {
-      console.error('Failed to fetch blog', err);
-      setNotFound(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return <LoadingSpinner text="Loading article..." />;
-  }
-
-  if (notFound || !post) {
+  if (!data) {
     return (
       <div style={{ backgroundColor: 'var(--bg)', minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
         <div style={{ textAlign: 'center' }}>
@@ -58,6 +35,7 @@ export default function BlogDetailPage({ params }) {
     );
   }
 
+  const { post, relatedPosts } = data;
   // Split the content into paragraphs (if the admin separated paragraphs with a blank line)
   const paragraphs = post.content.split('\n').filter((p) => p.trim());
 
@@ -66,16 +44,7 @@ export default function BlogDetailPage({ params }) {
       {/* Breadcrumb */}
       <div style={{ backgroundColor: 'white', padding: '14px 20px', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
-          <button onClick={() => {
-            if (typeof window !== 'undefined' && window.history.length > 1) {
-              router.back();
-            } else {
-              router.push('/blog');
-            }
-          }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '13px', fontWeight: '600', padding: '0', marginBottom: '10px' }}>
-            <FiArrowLeft size={15} /> Back
-          </button>
+          <BackButton fallback="/blog" />
           <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
             <Link href="/" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Home</Link>
             {' → '}
@@ -135,7 +104,7 @@ export default function BlogDetailPage({ params }) {
         )}
       </div>
 
-      <style jsx>{`
+      <style>{`
         @media (max-width: 600px) {
           [data-related-grid] {
             grid-template-columns: 1fr !important;

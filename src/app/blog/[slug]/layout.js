@@ -1,7 +1,6 @@
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
-
-const SITE_URL = 'https://furrandfeathers.com';
+import { SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/site';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -27,7 +26,7 @@ export async function generateMetadata({ params }) {
         description,
         type: 'article',
         url: `${SITE_URL}/blog/${slug}`,
-        images: post.image ? [{ url: post.image }] : undefined,
+        images: [{ url: post.image || `${SITE_URL}${DEFAULT_OG_IMAGE}` }],
       },
     };
   } catch (err) {

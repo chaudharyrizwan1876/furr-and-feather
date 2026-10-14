@@ -1,7 +1,6 @@
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
-
-const SITE_URL = 'https://furrandfeathers.com';
+import { SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/site';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -22,7 +21,7 @@ export async function generateMetadata({ params }) {
       product.shortDescription ||
       `${product.name} - ${product.category} - Genuine product available at Furr & Feather's Hospital Pakistan. COD available.`;
 
-    const imageUrl = product.images?.[0] || `${SITE_URL}/petsss.png`;
+    const imageUrl = product.images?.[0] || `${SITE_URL}${DEFAULT_OG_IMAGE}`;
     const price = product.discountPrice > 0 && product.discountPrice < product.price
       ? product.discountPrice
       : product.price;

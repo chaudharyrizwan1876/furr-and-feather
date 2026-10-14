@@ -1,7 +1,6 @@
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
-
-const SITE_URL = 'https://furrandfeathers.com';
+import { SITE_URL } from '@/lib/site';
 
 function slugify(text) {
   return text

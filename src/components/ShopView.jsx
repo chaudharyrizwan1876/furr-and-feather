@@ -1,11 +1,11 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FiFilter, FiX, FiArrowLeft } from 'react-icons/fi';
-import useCartStore from '@/store/useCartStore';
+import { FiFilter, FiX } from 'react-icons/fi';
 import toast from 'react-hot-toast';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import useCartStore from '@/store/useCartStore';
+import BackButton from '@/components/BackButton';
 
 const categories = [
   'All', 'Dog Medicines', 'Cat Medicines', 'Cat & Dog Medicines', 'Bird Medicines',
@@ -13,7 +13,7 @@ const categories = [
   'Pain Relief & Symptomatic Care', 'Skin & External Care', 'Equipment & Devices', 'Accessories',
 ];
 
-function FilterPanel({ selectedCategory, handleCategoryChange, priceRange, setPriceRange, searchQuery, setSearchQuery, sortBy, setSortBy, featuredOnly, setFeaturedOnly }) {
+function FilterPanel({ selectedCategory, handleCategoryChange, priceRange, setPriceRange, sortBy, setSortBy, featuredOnly, setFeaturedOnly, setSearchQuery }) {
   return (
     <div>
       <h3 style={{ fontSize: '15px', fontWeight: '700', marginBottom: '14px' }}>Categories</h3>
@@ -49,90 +49,45 @@ function FilterPanel({ selectedCategory, handleCategoryChange, priceRange, setPr
   );
 }
 
-// Receives initialProducts/initialCategory/initialFeatured that were already
-// fetched server-side (src/app/shop/page.js), so the first HTML response for
-// any ?category= URL already contains real products — important for SEO.
-export default function ShopClient({ initialProducts, initialCategory, initialFeatured }) {
-  const searchParams = useSearchParams();
+// All the interactivity for the Shop page. `initialProducts` is already
+// filtered by category on the server — everything else here (search, price
+// range, sort, featured toggle) is a pure client-side filter over that list.
+export default function ShopView({ initialProducts, initialCategory, initialFeatured }) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
-  const [products, setProducts] = useState(initialProducts);
-  const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory || 'All');
+
   const [priceRange, setPriceRange] = useState('All');
   const [sortBy, setSortBy] = useState('our-order');
   const [searchQuery, setSearchQuery] = useState('');
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [featuredOnly, setFeaturedOnly] = useState(initialFeatured || false);
-  const skippedFirstFetch = useRef(false);
+  const [featuredOnly, setFeaturedOnly] = useState(initialFeatured);
 
+  // Restore scroll position if the user navigated back from a product page
   useEffect(() => {
-    const categoryFromUrl = searchParams.get('category');
-    const featuredFromUrl = searchParams.get('featured');
-    setSelectedCategory(categoryFromUrl || 'All');
-    setFeaturedOnly(featuredFromUrl === 'true');
-    setReady(true);
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (!ready) return;
-    // The very first run matches what was already fetched server-side —
-    // skip it so we don't re-fetch the same data on initial load.
-    if (!skippedFirstFetch.current) {
-      skippedFirstFetch.current = true;
-      return;
+    const savedScroll = sessionStorage.getItem('shop-scroll-position');
+    if (savedScroll) {
+      sessionStorage.removeItem('shop-scroll-position');
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(savedScroll, 10));
+      });
     }
-    fetchProducts();
-  }, [selectedCategory, sortBy, ready]);
+  }, []);
 
-  // Once products are loaded, if a scroll position was saved earlier (user
-  // navigated back from a product page), scroll to that position so the user
-  // doesn't have to scroll again every time
-  useEffect(() => {
-    if (!loading && products.length > 0) {
-      const savedScroll = sessionStorage.getItem('shop-scroll-position');
-      if (savedScroll) {
-        sessionStorage.removeItem('shop-scroll-position');
-        requestAnimationFrame(() => {
-          window.scrollTo(0, parseInt(savedScroll, 10));
-        });
-      }
-    }
-  }, [loading, products]);
-
-  // Save the current scroll position before a product card is clicked
   const handleProductClick = () => {
     sessionStorage.setItem('shop-scroll-position', String(window.scrollY));
   };
 
-  // Save the category change to the URL, so the browser back button returns to the correct category
+  // Changing category navigates — the server re-fetches the product list for
+  // the new category and re-renders the page with it.
   const handleCategoryChange = (cat) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (cat === 'All') {
-      params.delete('category');
-    } else {
-      params.set('category', cat);
-    }
-    router.push(`/shop?${params.toString()}`, { scroll: false });
+    const qp = new URLSearchParams();
+    if (cat !== 'All') qp.set('category', cat);
+    const qs = qp.toString();
+    router.push(qs ? `/shop?${qs}` : '/shop', { scroll: false });
     setFiltersOpen(false);
   };
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const query = selectedCategory !== 'All' ? `?category=${encodeURIComponent(selectedCategory)}` : '';
-      const res = await fetch(`/api/products${query}`);
-      const data = await res.json();
-      setProducts(data);
-    } catch (err) {
-      console.error('Failed to fetch products', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  let filtered = products.filter((p) => {
+  let filtered = initialProducts.filter((p) => {
     if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     if (featuredOnly && !p.isFeatured) return false;
     if (priceRange !== 'All') {
@@ -147,7 +102,6 @@ export default function ShopClient({ initialProducts, initialCategory, initialFe
     return true;
   });
 
-  // Sorting
   filtered = [...filtered].sort((a, b) => {
     if (sortBy === 'our-order') return (a.sortOrder || 0) - (b.sortOrder || 0) || a._id.localeCompare(b._id);
     if (sortBy === 'price-low') {
@@ -170,17 +124,7 @@ export default function ShopClient({ initialProducts, initialCategory, initialFe
       {/* Page Header */}
       <div style={{ backgroundColor: 'var(--primary)', color: 'white', padding: '16px 16px' }}>
         <div className="container">
-          <button onClick={() => {
-            if (typeof window !== 'undefined' && window.history.length > 1) {
-              router.back();
-            } else {
-              router.push('/');
-            }
-          }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '13px', fontWeight: '600', padding: '0', marginBottom: '10px', opacity: 0.9 }}
-            className="desktop-back-btn">
-            <FiArrowLeft size={15} /> Back
-          </button>
+          <BackButton fallback="/" color="white" className="desktop-back-btn" />
           <h1 style={{ fontSize: 'clamp(1.3rem, 3vw, 1.6rem)', fontWeight: '800', marginBottom: '4px' }}>Shop</h1>
           <p style={{ opacity: 0.85, fontSize: '13px' }}>
             <Link href="/" style={{ color: 'white', textDecoration: 'none' }}>Home</Link>
@@ -194,7 +138,7 @@ export default function ShopClient({ initialProducts, initialCategory, initialFe
         {/* Desktop Sidebar */}
         <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '20px', position: 'sticky', top: '16px' }}
           className="desktop-filters">
-          <FilterPanel selectedCategory={selectedCategory} handleCategoryChange={handleCategoryChange} priceRange={priceRange} setPriceRange={setPriceRange} searchQuery={searchQuery} setSearchQuery={setSearchQuery} sortBy={sortBy} setSortBy={setSortBy} featuredOnly={featuredOnly} setFeaturedOnly={setFeaturedOnly} />
+          <FilterPanel selectedCategory={initialCategory} handleCategoryChange={handleCategoryChange} priceRange={priceRange} setPriceRange={setPriceRange} sortBy={sortBy} setSortBy={setSortBy} featuredOnly={featuredOnly} setFeaturedOnly={setFeaturedOnly} setSearchQuery={setSearchQuery} />
         </div>
 
         {/* Mobile Filter Button */}
@@ -213,7 +157,7 @@ export default function ShopClient({ initialProducts, initialCategory, initialFe
                 <h3 style={{ fontWeight: '700', fontSize: '16px' }}>Filters</h3>
                 <button onClick={() => setFiltersOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><FiX size={22} /></button>
               </div>
-              <FilterPanel selectedCategory={selectedCategory} handleCategoryChange={handleCategoryChange} priceRange={priceRange} setPriceRange={setPriceRange} searchQuery={searchQuery} setSearchQuery={setSearchQuery} sortBy={sortBy} setSortBy={setSortBy} featuredOnly={featuredOnly} setFeaturedOnly={setFeaturedOnly} />
+              <FilterPanel selectedCategory={initialCategory} handleCategoryChange={handleCategoryChange} priceRange={priceRange} setPriceRange={setPriceRange} sortBy={sortBy} setSortBy={setSortBy} featuredOnly={featuredOnly} setFeaturedOnly={setFeaturedOnly} setSearchQuery={setSearchQuery} />
             </div>
           </div>
         )}
@@ -235,18 +179,14 @@ export default function ShopClient({ initialProducts, initialCategory, initialFe
           </div>
 
           {/* Products Grid */}
-          {loading && products.length === 0 ? (
-            <div style={{ backgroundColor: 'white', borderRadius: '12px' }}>
-              <LoadingSpinner text="Loading products..." />
-            </div>
-          ) : filtered.length === 0 ? (
+          {filtered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'white', borderRadius: '12px' }}>
               <div style={{ fontSize: '56px', marginBottom: '16px' }}>🔍</div>
               <h3 style={{ color: 'var(--text)', marginBottom: '8px' }}>No products found</h3>
               <p style={{ color: 'var(--text-muted)' }}>Try changing your filters</p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '14px', opacity: loading ? 0.6 : 1, transition: 'opacity 0.2s' }}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '14px' }}
               data-products-grid>
               {filtered.map((product) => {
                 const hasDiscount = product.discountPrice > 0 && product.discountPrice < product.price;
@@ -293,7 +233,7 @@ export default function ShopClient({ initialProducts, initialCategory, initialFe
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @media (max-width: 768px) {
           [data-shop-grid] {
             grid-template-columns: 1fr !important;

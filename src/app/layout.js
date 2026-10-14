@@ -1,10 +1,8 @@
 import { Toaster } from 'react-hot-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '@/lib/site';
 import './globals.css';
-
-const SITE_URL = 'https://furrandfeathers.com'; // ← Enter your domain here when going live
-const SITE_NAME = "Furr & Feather's Hospital";
 
 export const metadata = {
   // Basic
@@ -37,7 +35,7 @@ export const metadata = {
     description: "Pakistan's trusted veterinary online store. Genuine medicines, supplements & pet food. COD available.",
     images: [
       {
-        url: '/petsss.png', // fallback share image until a dedicated 1200x630 og-image.png is designed
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
         alt: "Furr & Feather's Hospital — Pakistan's Trusted Pet Care Store",
@@ -50,7 +48,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: `${SITE_NAME} | Pet Medicines Pakistan`,
     description: 'Genuine pet medicines, supplements & food. COD Rawalpindi & Islamabad.',
-    images: ['/petsss.png'],
+    images: [DEFAULT_OG_IMAGE],
   },
 
   // Robots
