@@ -68,6 +68,11 @@ export const metadata = {
     google: '2pw4hs1NHQ5XbPMcwnEbWjWNnS5KWnw1bB-hgwTWZF0',
   },
 
+  // Pinterest domain verification
+  other: {
+    'p:domain_verify': '5931a1f8e7b29a0ac9226686ddc64417',
+  },
+
   // Favicon/icons — src/app/icon.png is picked up automatically by Next.js
   // (its file-naming convention), so no manual "icons" entry is needed here.
 
