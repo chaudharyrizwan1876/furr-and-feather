@@ -1,19 +1,27 @@
 import connectDB from '@/lib/mongodb';
 import Review from '@/models/Review';
 import Product from '@/models/Product';
+import { requireAdmin } from '@/lib/requireAdmin';
 import { NextResponse } from 'next/server';
 
 // GET /api/reviews — Fetch reviews
 // Query params (both optional):
 //   ?product=<productId> — only reviews for that product
 //   ?approved=true — only approved reviews (for customer-facing pages)
-// Without params (admin use): all reviews, all products
+// Without params (admin use): all reviews, all products — including unapproved ones, so this case requires admin
 export async function GET(request) {
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('product');
     const approvedOnly = searchParams.get('approved') === 'true';
+
+    if (!productId && !approvedOnly) {
+      const session = await requireAdmin();
+      if (!session) {
+        return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+      }
+    }
 
     let filter = {};
     if (productId) filter.product = productId;

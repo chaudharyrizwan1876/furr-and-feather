@@ -1,6 +1,7 @@
 import connectDB from '@/lib/mongodb';
 import Review from '@/models/Review';
 import Product from '@/models/Product';
+import { requireAdmin } from '@/lib/requireAdmin';
 import { NextResponse } from 'next/server';
 
 // Recalculate a product's rating and numReviews from its approved reviews
@@ -25,6 +26,11 @@ async function recalculateProductRating(productId) {
 // The product's rating + numReviews are automatically updated on approve/reject
 export async function PUT(request, { params }) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
     const body = await request.json();
@@ -52,6 +58,11 @@ export async function PUT(request, { params }) {
 // The product's rating is also updated when a review is deleted
 export async function DELETE(request, { params }) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
 

@@ -1,10 +1,16 @@
 import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
+import { requireAdmin } from '@/lib/requireAdmin';
 import { NextResponse } from 'next/server';
 
-// GET /api/orders/:id — Fetch a single order
+// GET /api/orders/:id — Fetch a single order (Admin)
 export async function GET(request, { params }) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
     const order = await Order.findById(id);
@@ -22,6 +28,11 @@ export async function GET(request, { params }) {
 // PUT /api/orders/:id — Update order status (Admin)
 export async function PUT(request, { params }) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
     const body = await request.json();

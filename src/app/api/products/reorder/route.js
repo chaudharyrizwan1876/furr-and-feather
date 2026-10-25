@@ -1,5 +1,6 @@
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
+import { requireAdmin } from '@/lib/requireAdmin';
 import { NextResponse } from 'next/server';
 
 // POST /api/products/reorder — Swap the order between two products
@@ -10,6 +11,11 @@ import { NextResponse } from 'next/server';
 //   'featuredOrder' — Home page "Featured Products" section order (only among featured products)
 export async function POST(request) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const { productId, direction, field, category } = await request.json();
 

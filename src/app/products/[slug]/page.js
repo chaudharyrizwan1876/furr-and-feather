@@ -3,11 +3,21 @@ import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Review from '@/models/Review';
+import Blog from '@/models/Blog';
 import { toPlain } from '@/lib/serialize';
 import { SITE_URL } from '@/lib/site';
 import { categoryUrl } from '@/lib/categories';
 import BackButton from '@/components/BackButton';
 import ProductView from '@/components/ProductView';
+
+// Reverse of the blog's BLOG_TO_PRODUCT_CATEGORY map — used to surface the
+// blog posts most relevant to the product a visitor is currently viewing.
+const PRODUCT_CATEGORY_TO_BLOG_CATEGORY = {
+  'Dog Medicines': 'Dog Care',
+  'Cat Medicines': 'Cat Care',
+  'Bird Medicines': 'Bird Care',
+  'Pet Food': 'Cat Care',
+};
 
 async function getProductData(slug) {
   await connectDB();
@@ -24,7 +34,15 @@ async function getProductData(slug) {
   const reviewDocs = await Review.find({ product: product._id, isApproved: true }).sort({ createdAt: -1 }).lean();
   const reviews = toPlain(reviewDocs);
 
-  return { product, relatedProducts, reviews };
+  const blogCategory = PRODUCT_CATEGORY_TO_BLOG_CATEGORY[product.category];
+  const blogFilter = blogCategory ? { isPublished: true, category: blogCategory } : { isPublished: true };
+  let relatedPostDocs = await Blog.find(blogFilter).sort({ createdAt: -1 }).limit(2).select('title slug excerpt image').lean();
+  if (relatedPostDocs.length === 0 && blogCategory) {
+    relatedPostDocs = await Blog.find({ isPublished: true }).sort({ createdAt: -1 }).limit(2).select('title slug excerpt image').lean();
+  }
+  const relatedPosts = toPlain(relatedPostDocs);
+
+  return { product, relatedProducts, reviews, relatedPosts };
 }
 
 export default async function ProductDetailPage({ params }) {
@@ -35,7 +53,7 @@ export default async function ProductDetailPage({ params }) {
     notFound();
   }
 
-  const { product, relatedProducts, reviews } = data;
+  const { product, relatedProducts, reviews, relatedPosts } = data;
   const hasDiscount = product.discountPrice > 0 && product.discountPrice < product.price;
 
   // JSON-LD Product Schema for Google Rich Results
@@ -135,7 +153,7 @@ export default async function ProductDetailPage({ params }) {
         </div>
       </div>
 
-      <ProductView product={product} relatedProducts={relatedProducts} reviews={reviews} />
+      <ProductView product={product} relatedProducts={relatedProducts} reviews={reviews} relatedPosts={relatedPosts} />
     </div>
   );
 }

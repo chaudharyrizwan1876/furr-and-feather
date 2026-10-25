@@ -20,7 +20,7 @@ function StarRating({ rating }) {
 // (variant/quantity selection, add to cart, tabs, review form). The product,
 // related products and reviews are fetched server-side and handed in as
 // props, so the initial HTML already contains the real content.
-export default function ProductView({ product, relatedProducts, reviews }) {
+export default function ProductView({ product, relatedProducts, reviews, relatedPosts = [] }) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
 
@@ -365,6 +365,30 @@ export default function ProductView({ product, relatedProducts, reviews }) {
                   <div style={{ padding: '12px' }}>
                     <h3 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</h3>
                     <p style={{ fontSize: '14px', fontWeight: '700', color: 'var(--primary)' }}>Rs. {p.price.toLocaleString()}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* From Our Blog */}
+      {relatedPosts.length > 0 && (
+        <div>
+          <h2 style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '16px' }}>From Our Blog</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '14px' }}>
+            {relatedPosts.map((post) => (
+              <Link key={post._id} href={`/blog/${post.slug}`} style={{ textDecoration: 'none' }}>
+                <div style={{ backgroundColor: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', transition: 'all 0.3s' }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                  <div style={{ backgroundColor: 'var(--bg)', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px', overflow: 'hidden' }}>
+                    {post.image ? <img src={post.image} alt={post.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📄'}
+                  </div>
+                  <div style={{ padding: '14px' }}>
+                    <h3 style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '6px', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.title}</h3>
+                    <p style={{ fontSize: '12px', color: 'var(--text-muted)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.excerpt}</p>
                   </div>
                 </div>
               </Link>

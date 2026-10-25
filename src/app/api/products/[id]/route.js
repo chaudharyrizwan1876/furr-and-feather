@@ -1,5 +1,6 @@
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
+import { requireAdmin } from '@/lib/requireAdmin';
 import { NextResponse } from 'next/server';
 
 // GET /api/products/:id — Fetch a single product
@@ -22,6 +23,11 @@ export async function GET(request, { params }) {
 // PUT /api/products/:id — Update a product (Admin)
 export async function PUT(request, { params }) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
     const body = await request.json();
@@ -47,6 +53,11 @@ export async function PUT(request, { params }) {
 // DELETE /api/products/:id — Delete a product (Admin)
 export async function DELETE(request, { params }) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const { id } = await params;
     const product = await Product.findByIdAndDelete(id);

@@ -1,11 +1,17 @@
 import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
+import { requireAdmin } from '@/lib/requireAdmin';
 import { NextResponse } from 'next/server';
 
 // GET /api/orders — Fetch all orders (for admin)
 export async function GET(request) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
     const orders = await Order.find({}).sort({ createdAt: -1 });
     return NextResponse.json(orders);

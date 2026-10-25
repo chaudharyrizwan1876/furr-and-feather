@@ -2,11 +2,17 @@ import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Order from '@/models/Order';
 import Review from '@/models/Review';
+import { requireAdmin } from '@/lib/requireAdmin';
 import { NextResponse } from 'next/server';
 
 // GET /api/dashboard-stats — Real stats for the admin dashboard overview
 export async function GET(request) {
   try {
+    const session = await requireAdmin();
+    if (!session) {
+      return NextResponse.json({ message: 'Admin login required' }, { status: 401 });
+    }
+
     await connectDB();
 
     const [totalProducts, totalOrders, orders, pendingOrders, lowStockProducts, pendingReviews] = await Promise.all([
