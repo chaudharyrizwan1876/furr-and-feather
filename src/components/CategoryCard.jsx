@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { optimizedImage } from '@/lib/cloudinaryUrl';
 
 // Just the hover effect needs the browser — kept as its own tiny client
 // component so the rest of the home page stays server-rendered.
@@ -12,7 +13,7 @@ export default function CategoryCard({ href, image, icon, name, count }) {
       >
         <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--bg)', margin: '0 auto 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
           {image ? (
-            <img src={image} alt={name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={optimizedImage(image, 120)} alt={name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             <span style={{ fontSize: '30px' }}>{icon}</span>
           )}

@@ -23,6 +23,14 @@ export async function POST(request) {
 
     const result = await cloudinary.uploader.upload(dataURI, {
       folder: 'furr-feathers/products',
+      // Store an already-compressed, size-capped version — AI generated images
+      // in particular can come in at several MB, far larger than anything the
+      // site ever displays
+      quality: 'auto',
+      fetch_format: 'auto',
+      width: 2000,
+      height: 2000,
+      crop: 'limit',
     });
 
     return NextResponse.json({ url: result.secure_url });

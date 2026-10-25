@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import useCartStore from '@/store/useCartStore';
 import toast from 'react-hot-toast';
 import { slugify as slugifyBrand } from '@/lib/slugify';
+import { optimizedImage } from '@/lib/cloudinaryUrl';
 
 function StarRating({ rating }) {
   return (
@@ -100,7 +101,7 @@ export default function ProductView({ product, relatedProducts, reviews, related
         <div>
           <div style={{ backgroundColor: 'var(--bg)', borderRadius: '12px', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '90px', marginBottom: '14px', overflow: 'hidden' }}>
             {images ? (
-              <img src={images[selectedImage]} alt={product.name} loading="eager" fetchPriority="high" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={optimizedImage(images[selectedImage], 800)} alt={product.name} loading="eager" fetchPriority="high" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               <span>📦</span>
             )}
@@ -110,7 +111,7 @@ export default function ProductView({ product, relatedProducts, reviews, related
               {images.map((img, i) => (
                 <div key={i} onClick={() => setSelectedImage(i)}
                   style={{ width: '64px', height: '64px', backgroundColor: 'var(--bg)', borderRadius: '8px', overflow: 'hidden', cursor: 'pointer', border: `2px solid ${selectedImage === i ? 'var(--primary)' : 'var(--border)'}` }}>
-                  <img src={img} alt={`${product.name} view ${i + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={optimizedImage(img, 150)} alt={`${product.name} view ${i + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ))}
             </div>
@@ -360,7 +361,7 @@ export default function ProductView({ product, relatedProducts, reviews, related
                   onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
                   onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
                   <div style={{ backgroundColor: 'var(--bg)', height: '110px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px', overflow: 'hidden' }}>
-                    {p.images && p.images[0] ? <img src={p.images[0]} alt={p.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📦'}
+                    {p.images && p.images[0] ? <img src={optimizedImage(p.images[0], 300)} alt={p.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📦'}
                   </div>
                   <div style={{ padding: '12px' }}>
                     <h3 style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</h3>
@@ -384,7 +385,7 @@ export default function ProductView({ product, relatedProducts, reviews, related
                   onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
                   onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
                   <div style={{ backgroundColor: 'var(--bg)', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px', overflow: 'hidden' }}>
-                    {post.image ? <img src={post.image} alt={post.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📄'}
+                    {post.image ? <img src={optimizedImage(post.image, 300)} alt={post.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📄'}
                   </div>
                   <div style={{ padding: '14px' }}>
                     <h3 style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '6px', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.title}</h3>

@@ -10,6 +10,10 @@ import { categoryUrl } from '@/lib/categories';
 import BackButton from '@/components/BackButton';
 import ProductView from '@/components/ProductView';
 
+// Cache each product page for 60 seconds instead of hitting the database on
+// every single visit — stock/price edits still show up within a minute.
+export const revalidate = 60;
+
 // Reverse of the blog's BLOG_TO_PRODUCT_CATEGORY map — used to surface the
 // blog posts most relevant to the product a visitor is currently viewing.
 const PRODUCT_CATEGORY_TO_BLOG_CATEGORY = {

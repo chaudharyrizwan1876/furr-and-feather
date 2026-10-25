@@ -8,6 +8,11 @@ import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '@/lib/site';
 import { categoryUrl } from '@/lib/categories';
 import BackButton from '@/components/BackButton';
 import ProductCard from '@/components/ProductCard';
+import { optimizedImage } from '@/lib/cloudinaryUrl';
+
+// Cache each blog post for 60 seconds instead of hitting the database on
+// every single visit.
+export const revalidate = 60;
 
 // Blog categories don't use the same names as product categories — this
 // maps a post's category to the product category its readers are most
@@ -107,7 +112,7 @@ export default async function BlogDetailPage({ params }) {
 
           {post.image && (
             <div style={{ backgroundColor: 'var(--bg)', height: '280px', borderRadius: '12px', overflow: 'hidden', marginBottom: '28px' }}>
-              <img src={post.image} alt={post.title} loading="eager" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={optimizedImage(post.image, 900)} alt={post.title} loading="eager" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
           )}
 
@@ -153,7 +158,7 @@ export default async function BlogDetailPage({ params }) {
                 <Link key={rp.slug} href={`/blog/${rp.slug}`} style={{ textDecoration: 'none' }}>
                   <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
                     <div style={{ width: '48px', height: '48px', borderRadius: '8px', backgroundColor: 'var(--bg)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
-                      {rp.image ? <img src={rp.image} alt={rp.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📄'}
+                      {rp.image ? <img src={optimizedImage(rp.image, 100)} alt={rp.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📄'}
                     </div>
                     <span style={{ fontWeight: '600', fontSize: '14px', color: 'var(--text)' }}>{rp.title}</span>
                   </div>

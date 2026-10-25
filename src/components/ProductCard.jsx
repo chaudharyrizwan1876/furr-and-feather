@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import useCartStore from '@/store/useCartStore';
+import { optimizedImage } from '@/lib/cloudinaryUrl';
 
 export function StarRating({ rating }) {
   return (
@@ -26,7 +27,7 @@ export default function ProductCard({ product }) {
       <Link href={`/products/${product.slug}`} style={{ textDecoration: 'none' }}>
         <div style={{ backgroundColor: 'var(--bg)', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
           {product.images && product.images[0] ? (
-            <img src={product.images[0]} alt={product.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={optimizedImage(product.images[0], 400)} alt={product.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             <span style={{ fontSize: '60px' }}>📦</span>
           )}

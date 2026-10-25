@@ -6,6 +6,10 @@ import { getCategoryBySlug, categoryDbFilter } from '@/lib/categories';
 import { SITE_URL } from '@/lib/site';
 import ShopView from '@/components/ShopView';
 
+// Cache each category page for 60 seconds instead of hitting the database on
+// every single visit — new/edited products still show up within a minute.
+export const revalidate = 60;
+
 export async function generateMetadata({ params }) {
   const { category } = await params;
   const cat = getCategoryBySlug(category);

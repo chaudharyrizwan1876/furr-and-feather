@@ -3,8 +3,9 @@ import Blog from '@/models/Blog';
 import { toPlain } from '@/lib/serialize';
 import BlogListView from '@/components/BlogListView';
 
-// Always render fresh — a newly published post should appear right away.
-export const dynamic = 'force-dynamic';
+// Cache the rendered page for 60 seconds instead of hitting the database on
+// every single visit — a newly published post still appears within a minute.
+export const revalidate = 60;
 
 async function getBlogs() {
   await connectDB();

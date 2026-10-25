@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import useCartStore from '@/store/useCartStore';
 import BackButton from '@/components/BackButton';
 import { CATEGORIES, categoryUrl } from '@/lib/categories';
+import { optimizedImage } from '@/lib/cloudinaryUrl';
 
 const categories = ['All', ...CATEGORIES.map((c) => c.name)];
 
@@ -191,7 +192,7 @@ export default function ShopView({ initialProducts, initialCategory, initialFeat
                       onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.06)'; }}>
                       <div style={{ backgroundColor: 'var(--bg)', height: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
                         {product.images?.[0] ? (
-                          <img src={product.images[0]} alt={product.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={optimizedImage(product.images[0], 400)} alt={product.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                           <span style={{ fontSize: '40px' }}>📦</span>
                         )}

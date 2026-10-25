@@ -7,6 +7,10 @@ import { toPlain } from '@/lib/serialize';
 import { slugify } from '@/lib/slugify';
 import ProductCard from '@/components/ProductCard';
 
+// Cache each brand page for 60 seconds instead of hitting the database on
+// every single visit.
+export const revalidate = 60;
+
 async function getBrandProducts(slug) {
   await connectDB();
   const allProducts = toPlain(await Product.find({ isActive: true }).sort({ createdAt: -1 }).lean());

@@ -10,10 +10,11 @@ import ProductCard, { StarRating } from '@/components/ProductCard';
 import CategoryCard from '@/components/CategoryCard';
 import { CATEGORIES } from '@/lib/categories';
 
-// Always render fresh from the database — admin changes (new products,
-// featured order, approved reviews) must show immediately, not only after
-// the next deploy.
-export const dynamic = 'force-dynamic';
+// Cache the rendered page for 60 seconds instead of hitting the database on
+// every single visit (force-dynamic) — admin changes (new products, featured
+// order, approved reviews) still show up within a minute, but most visitors
+// get an instant cached response instead of waiting on a fresh DB query.
+export const revalidate = 60;
 
 const trustBadges = [
   { icon: <FiShield size={28} />, title: 'Genuine Products', desc: 'Trusted and Certified' },

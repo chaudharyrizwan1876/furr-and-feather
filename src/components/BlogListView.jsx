@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { optimizedImage } from '@/lib/cloudinaryUrl';
 
 const categories = ['All', 'Dog Care', 'Cat Care', 'Bird Care', 'General'];
 
@@ -36,7 +37,7 @@ export default function BlogListView({ blogs }) {
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.06)'; }}>
                 <div style={{ backgroundColor: 'var(--bg)', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '70px', overflow: 'hidden' }}>
                   {post.image ? (
-                    <img src={post.image} alt={post.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={optimizedImage(post.image, 500)} alt={post.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : '📄'}
                 </div>
                 <div style={{ padding: '20px' }}>
