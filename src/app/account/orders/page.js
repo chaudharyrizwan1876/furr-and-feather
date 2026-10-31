@@ -99,7 +99,7 @@ export default function MyOrdersPage() {
         </button>
 
         <h1 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text)', marginBottom: '4px' }}>My Orders</h1>
-        <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '20px' }}>Your complete order history — always available here</p>
+        <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '20px' }}>Your complete order history, always available here</p>
 
         {orders.length === 0 ? (
           <div style={{ backgroundColor: 'white', borderRadius: '14px', padding: '50px 20px', textAlign: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>

@@ -254,7 +254,7 @@ export default function ProductView({ product, relatedProducts, reviews, related
             {reviews.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-muted)' }}>
                 <div style={{ fontSize: '48px', marginBottom: '12px' }}>⭐</div>
-                <p>No reviews yet — be the first to write one!</p>
+                <p>No reviews yet, be the first to write one!</p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>

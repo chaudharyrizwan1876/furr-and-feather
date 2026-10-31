@@ -212,7 +212,7 @@ export default function CheckoutPage() {
           {/* WhatsApp Confirmation Button */}
           <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
             <p style={{ fontSize: '13px', color: '#166534', fontWeight: '600', marginBottom: '4px' }}>📱 Confirm Your Order</p>
-            <p style={{ fontSize: '12px', color: '#166534', marginBottom: '12px', opacity: 0.8 }}>For the best experience, confirm your order on WhatsApp — the message will already be ready, just tap send</p>
+            <p style={{ fontSize: '12px', color: '#166534', marginBottom: '12px', opacity: 0.8 }}>For the best experience, confirm your order on WhatsApp. The message will already be ready, just tap send</p>
             <a href={waLink} target="_blank" rel="noopener noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: '#25D366', color: 'white', padding: '12px 24px', borderRadius: '8px', fontWeight: '700', textDecoration: 'none', fontSize: '15px' }}>
               <FaWhatsapp size={20} /> Confirm on WhatsApp
@@ -345,7 +345,7 @@ export default function CheckoutPage() {
             {isCOD ? (
               <>
                 <p style={{ fontWeight: '700', fontSize: '14px', color: '#92400e', marginBottom: '8px' }}>
-                  📦 Cash on Delivery — Advance Delivery Charges Required
+                  📦 Cash on Delivery: Advance Delivery Charges Required
                 </p>
                 <p style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.6', marginBottom: '10px' }}>
                   To confirm your order, please pay Rs. {SHIPPING_COST} delivery charges in advance. The remaining amount (Rs. {subtotal.toLocaleString()}) will be paid in cash on delivery.
@@ -361,7 +361,7 @@ export default function CheckoutPage() {
               </>
             ) : paymentMethod === 'BankTransfer' ? (
               <>
-                <p style={{ fontWeight: '700', fontSize: '14px', color: '#92400e', marginBottom: '8px' }}>🏦 Bank Transfer — Advance Payment Required</p>
+                <p style={{ fontWeight: '700', fontSize: '14px', color: '#92400e', marginBottom: '8px' }}>🏦 Bank Transfer: Advance Payment Required</p>
                 <p style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.6', marginBottom: '10px' }}>
                   {isCOD
                     ? `To confirm your order, please transfer the delivery charges of Rs. ${SHIPPING_COST} in advance. The product amount (Rs. ${subtotal.toLocaleString()}) will be collected at the time of delivery.`
@@ -381,7 +381,7 @@ export default function CheckoutPage() {
             ) : (
               <>
                 <p style={{ fontWeight: '700', fontSize: '14px', color: '#92400e', marginBottom: '8px' }}>
-                  📱 {paymentMethod} — Advance Payment Required
+                  📱 {paymentMethod}: Advance Payment Required
                 </p>
                 <p style={{ fontSize: '13px', color: '#92400e', lineHeight: '1.6', marginBottom: '10px' }}>
                   {isCOD
@@ -440,8 +440,8 @@ export default function CheckoutPage() {
 
           <button onClick={handleSubmit} disabled={loading} className="btn-primary" style={{ width: '100%', padding: '15px', fontSize: '15px', fontWeight: '800', textAlign: 'center', opacity: loading ? 0.7 : 1 }}>
             {loading ? 'Placing Order...' : isCODAvailable
-              ? `✅ Place Order — Pay Rs. ${SHIPPING_COST} Now`
-              : `✅ Place Order — Pay Rs. ${total.toLocaleString()} Now`
+              ? `✅ Place Order, Pay Rs. ${SHIPPING_COST} Now`
+              : `✅ Place Order, Pay Rs. ${total.toLocaleString()} Now`
             }
           </button>
         </div>

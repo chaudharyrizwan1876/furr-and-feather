@@ -20,7 +20,7 @@ export default function AboutPage() {
           <div>
             <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)', marginBottom: '18px' }}>Our Story</h2>
             <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--text)', marginBottom: '16px' }}>
-              Furr & Feather's Hospital was founded with a simple mission — to make genuine, high-quality veterinary medicines and pet care products accessible to every pet owner in Pakistan.
+              Furr & Feather's Hospital was founded with a simple mission, to make genuine, high-quality veterinary medicines and pet care products accessible to every pet owner in Pakistan.
             </p>
             <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--text)' }}>
               As a team led by a qualified veterinary doctor, we understand the importance of authentic products and proper guidance when it comes to your pet's health. We've built this platform to bridge the gap between trusted veterinary care and everyday pet owners across the country.
@@ -53,7 +53,7 @@ export default function AboutPage() {
             <div style={{ fontSize: '36px', marginBottom: '16px' }}>🎯</div>
             <h3 style={{ fontWeight: '700', fontSize: '18px', color: 'var(--primary)', marginBottom: '12px' }}>Our Mission</h3>
             <p style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--text-muted)' }}>
-              To provide every pet owner in Pakistan with easy access to genuine veterinary medicines, expert-recommended supplements, and reliable pet care products — backed by fast delivery and trustworthy service.
+              To provide every pet owner in Pakistan with easy access to genuine veterinary medicines, expert-recommended supplements, and reliable pet care products, backed by fast delivery and trustworthy service.
             </p>
           </div>
           <div style={{ backgroundColor: 'white', borderRadius: '14px', padding: '32px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>

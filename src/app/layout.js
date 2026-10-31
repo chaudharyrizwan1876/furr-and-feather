@@ -38,7 +38,7 @@ export const metadata = {
         url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Furr & Feather's Hospital — Pakistan's Trusted Pet Care Store",
+        alt: "Furr & Feather's Hospital, Pakistan's Trusted Pet Care Store",
       },
     ],
   },

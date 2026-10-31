@@ -18,7 +18,7 @@ export async function GET(request) {
     const order = await Order.findOne({ _id: orderId, phone: phone });
 
     if (!order) {
-      return NextResponse.json({ message: 'Order not found — please check your Order ID or phone number' }, { status: 404 });
+      return NextResponse.json({ message: 'Order not found, please check your Order ID or phone number' }, { status: 404 });
     }
 
     return NextResponse.json(order);

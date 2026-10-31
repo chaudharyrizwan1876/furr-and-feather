@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Contact Us — Furr & Feather's Hospital",
+  title: "Contact Us",
   description: "Get in touch with Furr & Feather's Hospital. Rawalpindi, Pakistan. Reach us via WhatsApp, phone, or email.",
 };
 

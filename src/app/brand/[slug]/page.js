@@ -38,7 +38,7 @@ export default async function BrandPage({ params }) {
             <FiArrowLeft size={15} /> Back to Shop
           </Link>
           <h1 style={{ fontSize: 'clamp(1.4rem, 3vw, 1.8rem)', fontWeight: '800', marginBottom: '4px' }}>{brandName} Products in Pakistan</h1>
-          <p style={{ opacity: 0.85, fontSize: '13px' }}>{products.length} genuine {brandName} product{products.length !== 1 ? 's' : ''} available — Cash on Delivery in Rawalpindi & Islamabad</p>
+          <p style={{ opacity: 0.85, fontSize: '13px' }}>{products.length} genuine {brandName} product{products.length !== 1 ? 's' : ''} available, Cash on Delivery in Rawalpindi & Islamabad</p>
         </div>
       </div>
 

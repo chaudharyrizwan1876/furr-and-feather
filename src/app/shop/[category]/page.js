@@ -17,7 +17,7 @@ export async function generateMetadata({ params }) {
     return { title: 'Category Not Found' };
   }
 
-  const title = `${cat.name} in Pakistan — Genuine Products, COD Available`;
+  const title = `${cat.name} in Pakistan: Genuine Products, COD Available`;
   const description = `Shop genuine ${cat.name.toLowerCase()} online in Pakistan. Cash on Delivery in Rawalpindi and Islamabad, fast delivery nationwide. 100% authentic products at Furr & Feather's Hospital.`;
 
   return {

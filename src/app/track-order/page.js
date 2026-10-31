@@ -192,7 +192,7 @@ export default function TrackOrderPage() {
           <>
             <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', marginBottom: '20px' }}>
               <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '14px' }}>
-                Don't remember your Order ID? No problem — just enter your phone number and you'll get a list of ALL orders placed with that number.
+                Don't remember your Order ID? No problem, just enter your phone number and you'll get a list of ALL orders placed with that number.
               </p>
               <form onSubmit={handleTrackByPhone} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 <input type="text" value={phoneOnly} onChange={(e) => setPhoneOnly(e.target.value)} placeholder="03xxxxxxxxx"
