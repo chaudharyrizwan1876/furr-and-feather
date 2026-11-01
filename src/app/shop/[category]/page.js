@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { toPlain } from '@/lib/serialize';
-import { getCategoryBySlug, categoryDbFilter } from '@/lib/categories';
+import { getCategoryBySlug, categoryDbFilter, categoryIntro } from '@/lib/categories';
 import { SITE_URL } from '@/lib/site';
 import ShopView from '@/components/ShopView';
 
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }) {
   }
 
   const title = `${cat.name} in Pakistan: Genuine Products, COD Available`;
-  const description = `Shop genuine ${cat.name.toLowerCase()} online in Pakistan. Cash on Delivery in Rawalpindi and Islamabad, fast delivery nationwide. 100% authentic products at Furr & Feather's Hospital.`;
+  const description = categoryIntro(cat.name);
 
   return {
     title,
@@ -46,5 +46,21 @@ export default async function ShopCategoryPage({ params, searchParams }) {
 
   const products = await getProducts(cat.name);
 
-  return <ShopView initialProducts={products} initialCategory={cat.name} initialFeatured={featured} />;
+  // JSON-LD Breadcrumb Schema
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'Shop', item: `${SITE_URL}/shop` },
+      { '@type': 'ListItem', position: 3, name: cat.name, item: `${SITE_URL}/shop/${cat.slug}` },
+    ],
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <ShopView initialProducts={products} initialCategory={cat.name} initialFeatured={featured} intro={categoryIntro(cat.name)} />
+    </>
+  );
 }

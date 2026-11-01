@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { toPlain } from '@/lib/serialize';
@@ -15,11 +15,12 @@ export default async function ShopPage({ searchParams }) {
   const sp = await searchParams;
 
   // Old-style links (?category=Dog+Medicines) now have a dedicated URL at
-  // /shop/[category] — redirect so there's one canonical URL per category
-  // instead of two different ones with the same content.
+  // /shop/[category] — permanently redirect (308) so there's one canonical
+  // URL per category instead of two different ones with the same content,
+  // and so link equity passes through to the new URL.
   if (sp?.category) {
     const url = categoryUrl(sp.category);
-    redirect(url !== '/shop' ? `${url}${sp.featured === 'true' ? '?featured=true' : ''}` : '/shop');
+    permanentRedirect(url !== '/shop' ? `${url}${sp.featured === 'true' ? '?featured=true' : ''}` : '/shop');
   }
 
   const featured = sp?.featured === 'true';

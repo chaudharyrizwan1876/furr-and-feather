@@ -5,6 +5,7 @@ import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { toPlain } from '@/lib/serialize';
 import { slugify } from '@/lib/slugify';
+import { SITE_URL } from '@/lib/site';
 import ProductCard from '@/components/ProductCard';
 
 // Cache each brand page for 60 seconds instead of hitting the database on
@@ -29,8 +30,20 @@ export default async function BrandPage({ params }) {
 
   const { products, brandName } = data;
 
+  // JSON-LD Breadcrumb Schema
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'Shop', item: `${SITE_URL}/shop` },
+      { '@type': 'ListItem', position: 3, name: brandName, item: `${SITE_URL}/brand/${slug}` },
+    ],
+  };
+
   return (
     <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Page Header */}
       <div style={{ backgroundColor: 'var(--primary)', color: 'white', padding: '30px 16px' }}>
         <div className="container">

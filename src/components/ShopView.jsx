@@ -50,7 +50,7 @@ function FilterPanel({ selectedCategory, handleCategoryChange, priceRange, setPr
 // All the interactivity for the Shop page. `initialProducts` is already
 // filtered by category on the server — everything else here (search, price
 // range, sort, featured toggle) is a pure client-side filter over that list.
-export default function ShopView({ initialProducts, initialCategory, initialFeatured }) {
+export default function ShopView({ initialProducts, initialCategory, initialFeatured, intro }) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
 
@@ -120,10 +120,13 @@ export default function ShopView({ initialProducts, initialCategory, initialFeat
       <div style={{ backgroundColor: 'var(--primary)', color: 'white', padding: '16px 16px' }}>
         <div className="container">
           <BackButton fallback="/" color="white" className="desktop-back-btn" />
-          <h1 style={{ fontSize: 'clamp(1.3rem, 3vw, 1.6rem)', fontWeight: '800', marginBottom: '4px' }}>Shop</h1>
+          <h1 style={{ fontSize: 'clamp(1.3rem, 3vw, 1.6rem)', fontWeight: '800', marginBottom: '4px' }}>
+            {initialCategory && initialCategory !== 'All' ? initialCategory : 'Shop'}
+          </h1>
           <p style={{ opacity: 0.85, fontSize: '13px' }}>
             <Link href="/" style={{ color: 'white', textDecoration: 'none' }}>Home</Link>
-            {' → '} Shop
+            {' → '} <Link href="/shop" style={{ color: 'white', textDecoration: 'none' }}>Shop</Link>
+            {initialCategory && initialCategory !== 'All' ? <> {' → '} {initialCategory}</> : null}
           </p>
         </div>
       </div>
@@ -159,6 +162,9 @@ export default function ShopView({ initialProducts, initialCategory, initialFeat
 
         {/* Products Grid */}
         <div>
+          {intro && (
+            <p style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--text-muted)', marginBottom: '18px' }}>{intro}</p>
+          )}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
             <input type="text" placeholder="Search products..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
               style={{ flex: 1, minWidth: '200px', padding: '10px 14px', borderRadius: '8px', border: '2px solid var(--border)', outline: 'none', fontSize: '14px' }} />
