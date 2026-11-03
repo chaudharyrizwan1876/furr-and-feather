@@ -20,11 +20,20 @@ export async function generateMetadata({ params }) {
   const title = `${cat.name} in Pakistan: Genuine Products, COD Available`;
   const description = categoryIntro(cat.name);
 
+  // If this category currently has no stock, keep the page out of Google's
+  // index — an empty category page is thin content that tends to get
+  // flagged as a Soft 404, and it's already excluded from the sitemap and
+  // from internal navigation, so this is just a second layer of protection.
+  await connectDB();
+  const inStockCount = await Product.countDocuments({ isActive: true, category: categoryDbFilter(cat.name) });
+  const robots = inStockCount === 0 ? { index: false, follow: true } : undefined;
+
   return {
     title,
     description,
     alternates: { canonical: `${SITE_URL}/shop/${cat.slug}` },
     openGraph: { title, description, url: `${SITE_URL}/shop/${cat.slug}`, type: 'website' },
+    ...(robots && { robots }),
   };
 }
 

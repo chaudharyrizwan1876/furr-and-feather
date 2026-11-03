@@ -4,7 +4,13 @@ import Image from 'next/image';
 import { FaFacebook, FaInstagram, FaYoutube, FaWhatsapp } from 'react-icons/fa';
 import { CATEGORIES } from '@/lib/categories';
 
-export default function Footer() {
+export default function Footer({ categoriesInStock }) {
+  // Only link to categories that currently have at least one product — an
+  // empty category page is thin content Google tends to flag as a Soft 404,
+  // so it shouldn't be linked to from every page on the site. Falls back to
+  // showing all categories if the stock check failed for some reason.
+  const visibleCategories = CATEGORIES.filter((c) => !c.combined && (!categoriesInStock || categoriesInStock.includes(c.name)));
+
   return (
     <footer style={{ backgroundColor: 'var(--primary)', color: 'white', marginTop: '40px' }}>
       <div className="container" style={{ padding: '28px 20px 18px' }}>
@@ -59,7 +65,7 @@ export default function Footer() {
           {/* Categories */}
           <div>
             <h4 style={{ fontWeight: '700', marginBottom: '10px', fontSize: '14px' }}>Categories</h4>
-            {CATEGORIES.filter((c) => !c.combined).map((cat) => (
+            {visibleCategories.map((cat) => (
               <Link key={cat.slug} href={`/shop/${cat.slug}`} style={{ display: 'block', color: 'rgba(255,255,255,0.8)', textDecoration: 'none', marginBottom: '6px', fontSize: '13px' }}
                 onMouseEnter={e => e.target.style.opacity = '1'}
                 onMouseLeave={e => e.target.style.opacity = '0.8'}
