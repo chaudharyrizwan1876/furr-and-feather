@@ -152,7 +152,7 @@ export default async function HomePage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px' }}
             data-category-grid>
-            {CATEGORIES.map((cat) => (
+            {CATEGORIES.filter((cat) => (categoryCounts[cat.name] || 0) > 0).map((cat) => (
               <CategoryCard
                 key={cat.slug}
                 href={`/shop/${cat.slug}`}
