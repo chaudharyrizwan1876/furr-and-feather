@@ -2,7 +2,23 @@ import { Toaster } from 'react-hot-toast';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '@/lib/site';
+import connectDB from '@/lib/mongodb';
+import Product from '@/models/Product';
 import './globals.css';
+
+// Cached for 5 minutes — avoids a DB round trip on every single request
+// across the whole site, while still staying reasonably fresh.
+export const revalidate = 300;
+
+async function getCategoriesInStock() {
+  try {
+    await connectDB();
+    const categoriesInStock = await Product.distinct('category', { isActive: true });
+    return categoriesInStock;
+  } catch {
+    return null; // Fall back to showing all categories if the DB call fails
+  }
+}
 
 export const metadata = {
   // Basic
@@ -115,7 +131,9 @@ const organizationSchema = {
   areaServed: ['Rawalpindi', 'Islamabad', 'Pakistan'],
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const categoriesInStock = await getCategoriesInStock();
+
   return (
     <html lang="en">
       <body>
@@ -123,7 +141,7 @@ export default function RootLayout({ children }) {
         <Toaster position="top-right" />
         <Navbar />
         {children}
-        <Footer />
+        <Footer categoriesInStock={categoriesInStock} />
       </body>
     </html>
   );
